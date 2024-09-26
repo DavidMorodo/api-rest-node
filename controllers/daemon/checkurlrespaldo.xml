@@ -1,0 +1,25 @@
+<service>
+	<id>checkurlrespaldo.exe</id>
+	<name>checkurlRespaldo</name>
+	<description>Check de la url de backup respaldo node Web</description>
+	<executable>C:\Program Files\nodejs\node.exe</executable>
+	<logmode>rotate</logmode>
+	<argument>--harmony</argument>
+	<argument>C:\Users\Administrador\AppData\Roaming\npm\node_modules\qckwinsvc\node_modules\node-windows\lib\wrapper.js</argument>
+	<argument>--file</argument>
+	<argument>C:\webservice\api-rest-node\controllers\checkurl.js</argument>
+	<argument>--log</argument>
+	<argument>checkurlRespaldo wrapper</argument>
+	<argument>--grow</argument>
+	<argument>0.25</argument>
+	<argument>--wait</argument>
+	<argument>1</argument>
+	<argument>--maxrestarts</argument>
+	<argument>3</argument>
+	<argument>--abortonerror</argument>
+	<argument>n</argument>
+	<argument>--stopparentfirst</argument>
+	<argument>undefined</argument>
+	<stoptimeout>30sec</stoptimeout>
+	<workingdirectory>C:\webservice\api-rest-node\controllers</workingdirectory>
+</service>

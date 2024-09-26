@@ -1,0 +1,20 @@
+2023-02-01 13:52:34 - Starting node.exe --harmony "C:\salesforce\api-rest-salesforce\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServerSalesforceApi" -g 0.25 -w 1 -r 3 -a n
+2023-02-01 13:52:34 - Started 3048
+2023-02-01 13:52:41 - Stopping nodeserversalesforceapi.exe
+2023-02-01 13:52:41 - ProcessKill 3048
+2023-02-01 13:52:41 - Finished nodeserversalesforceapi.exe
+2023-02-01 13:52:42 - Starting node.exe --harmony "C:\salesforce\api-rest-salesforce\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServerSalesforceApi" -g 0.25 -w 1 -r 3 -a n
+2023-02-01 13:52:42 - Started 7228
+2023-02-01 13:53:12 - Stopping nodeserversalesforceapi.exe
+2023-02-01 13:53:12 - ProcessKill 7228
+2023-02-01 13:53:12 - Finished nodeserversalesforceapi.exe
+2023-02-01 13:53:15 - Starting node.exe --harmony "C:\salesforce\api-rest-salesforce\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServerSalesforceApi" -g 0.25 -w 1 -r 3 -a n
+2023-02-01 13:53:15 - Started 1796
+2023-02-01 13:54:07 - Stopping nodeserversalesforceapi.exe
+2023-02-01 13:54:07 - ProcessKill 1796
+2023-02-01 13:54:07 - Finished nodeserversalesforceapi.exe
+2023-02-01 13:54:08 - Starting node.exe --harmony "C:\salesforce\api-rest-salesforce\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServerSalesforceApi" -g 0.25 -w 1 -r 3 -a n
+2023-02-01 13:54:08 - Started 4720
+2023-02-01 13:54:50 - Stopping nodeserversalesforceapi.exe
+2023-02-01 13:54:50 - ProcessKill 4720
+2023-02-01 13:54:50 - Finished nodeserversalesforceapi.exe

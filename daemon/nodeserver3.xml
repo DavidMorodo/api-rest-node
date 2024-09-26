@@ -1,0 +1,1 @@
+<service><id>nodeserver3.exe</id><name>nodeServer3</name><description>Servicio servidor Webservice</description><executable>node.exe</executable><arguments>--harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer3" -g 0.25 -w 1 -r 3 -a n</arguments><logmode>rotate</logmode></service>

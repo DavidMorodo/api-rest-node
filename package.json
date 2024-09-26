@@ -1,0 +1,37 @@
+{
+  "name": "api_rest_node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jose Luis Sanchez",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "body-parser": "^1.19.0",
+    "body-parser-xml": "^2.0.3",
+    "connect-multiparty": "^2.2.0",
+    "crypto-js": "^4.1.1",
+    "express": "^4.16.4",
+    "generate-password": "^1.7.0",
+    "jwt-simple": "^0.5.5",
+    "moment": "^2.24.0",
+    "msnodesqlv8": "^2.4.3",
+    "mssql": "^7.3.0",
+    "mysql": "^2.18.1",
+    "node-cron": "^3.0.3",
+    "node-windows": "^0.1.4",
+    "odata": "^1.3.2",
+    "tedious": "^14.0.0",
+    "tedious-connection-pool": "^1.0.5",
+    "validator": "^13.7.0",
+    "xml2js": "^0.4.23",
+    "xmlserializer": "^0.6.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}

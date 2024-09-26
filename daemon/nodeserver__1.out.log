@@ -1,0 +1,417 @@
+Server is running..
+2024-9-11//13:54:47-Conectado a la base de datos de OFICINA REPLICA .true
+2024-9-11//13:54:47xempresa_id --- SCHB
+2024-9-11//13:54:47xcliente_id --- 140230
+2024-9-11//13:54:47xarticulo_id --- 0197000271
+2024-9-11//13:54:47xcantidad --- 9
+2024-9-11//13:54:47[object Object]
+2024-9-11//13:54:47 Insertamos precio.
+2024-9-11//13:55:29-Conectado a la base de datos N992_DATA_UNIT4 en 172.26.0.4
+2024-9-12//3:43:26-Conectado a la base datos de CLARANET.true
+2024-9-12//3:44:24-Conectado a la base datos de CLARANET.true
+2024-9-12//3:45:4-Conectado a la base datos de CLARANET.true
+2024-9-12//3:45:43-Conectado a la base datos de CLARANET.true
+2024-9-12//3:47:18-Conectado a la base datos de CLARANET.true
+2024-9-12//3:47:52-Conectado a la base datos de CLARANET.true
+2024-9-12//9:42:48-Conectado a la base de datos de OFICINA REPLICA .true
+2024-9-12//9:42:48xempresa_id --- BIBB
+2024-9-12//12:25:31-Conectado a la base de datos de OFICINA REPLICA .true
+2024-9-12//12:25:31xempresa_id --- SCHB
+2024-9-12//12:25:31xcliente_id --- 140230
+2024-9-12//12:25:31xarticulo_id --- 0197000271
+2024-9-12//12:25:31xcantidad --- 9
+2024-9-12//12:25:31[object Object]
+2024-9-12//12:25:31 Insertamos precio.
+2024-9-12//12:25:40-Conectado a la base de datos de OFICINA REPLICA .true
+2024-9-12//12:25:40xempresa_id --- SCHB
+2024-9-12//12:25:40xcliente_id --- 140230
+2024-9-12//12:25:40xarticulo_id --- 0197000271
+2024-9-12//12:25:40xcantidad --- 9
+2024-9-12//12:25:40[object Object]
+2024-9-12//12:25:41 Insertamos precio.
+2024-9-12//12:25:42-Conectado a la base de datos de OFICINA REPLICA .true
+2024-9-12//12:25:42xempresa_id --- SCHB
+2024-9-12//12:25:42xcliente_id --- 140230
+2024-9-12//12:25:42xarticulo_id --- 0197000271
+2024-9-12//12:25:42xcantidad --- 9
+2024-9-12//12:25:42[object Object]
+2024-9-12//12:25:44 Insertamos precio.
+2024-9-12//13:26:56-Conectado a la base de datos de OFICINA REPLICA .true
+2024-9-12//13:26:56xempresa_id --- BIBB
+Server is running..
+Server is running..
+Server is running..
+Server is running..
+2024-9-17//17:1:55-Conectado a la base de datos N992_DATA_UNIT4 en 172.26.0.4
+2024-9-18//8:20:9-Conectado a la base de datos N992_DATA_UNIT4 en 172.26.0.4
+Wed Sep 25 2024 17:53:27 GMT+0200 (hora de verano de Europa central)Server is running..
+2024-9-26//10:51:41SELECT OK: SELECT  
+xarticulo_id,
+CASE WHEN xorden>0 THEN 0 ELSE 1 END AS xorden,
+ISNULL(xdisponible,0) AS xdisponible 
+FROM (
+SELECT DISTINCT s.xarticulo_id,
+	isnull(CLI.XCANTIDAD,0) AS xorden ,
+	isnull(ex.xdisponible,0) AS xdisponible,
+ISNULL(A.N992_MARCA,'999') AS xmarca,
+CHARINDEX('Fehling’s',s.xbusqueda) as xindexbuscar
+FROM imp.n992_wc_superquery s
+INNER JOIN yy_ws_emp_conv conv ON s.xempresa_id = conv.xempresa_id
+INNER JOIN imp.pl_articulos a ON s.xempresa_id = a.xempresa_id AND s.xarticulo_id = a.xarticulo_id AND a.n992_baja != '-1' AND a.n992_descat != '-1'
+INNER JOIN pl_familias f ON f.xempresa_id=s.xempresa_id AND f.xfamilia_id=a.xfamilia_id  AND ISNULL(f.n992_linea,'00')<>'11'
+LEFT OUTER JOIN imp.yy_ws_art_cli_ano cli ON cli.XEMPRESA_ID=s.xempresa_id AND cli.XCLIENTE_ID= '00964' AND cli.XARTICULO_ID=s.xarticulo_id 
+LEFT OUTER JOIN imp.yy_ws_existencias ex ON ex.xempresa_id=s.xempresa_id AND ex.xarticulo_id=s.xarticulo_id 
+LEFT OUTER JOIN imp.pl_cli_preart pesp ON pesp.xempresa_id=s.xempresa_id AND pesp.xcliente_id='00964' AND pesp.xarticulo_id=s.xarticulo_id
+WHERE conv.xempresa_conv_id = 'SCHB' 
+AND ( (a.n992_intranet='-1')  OR (ISNULL(pesp.xprecio,0)<>0) )
+ AND ( CONTAINS (s.xbusqueda, '"fehling’s*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"solution*"', language 3082)  )  
+
+union all
+
+SELECT DISTINCT alt.xref_alternativa AS xarticulo_id,
+0 AS xorden ,
+isnull(ex.xdisponible,0) AS xdisponible,
+'999' AS xmarca,
+CHARINDEX('Fehling’s',s.xbusqueda) as xindexbuscar
+FROM imp.n992_wc_superquery s
+INNER JOIN yy_ws_emp_conv conv ON s.xempresa_id = conv.xempresa_id
+INNER JOIN yy_ref_alterna_art alt ON alt.xempresa_id=s.xempresa_id AND alt.xarticulo_id=s.xarticulo_id 
+INNER JOIN imp.pl_articulos a ON a.xempresa_id = s.xempresa_id AND a.xarticulo_id = alt.xref_alternativa AND a.n992_baja != '-1' AND a.n992_descat != '-1' AND a.n992_intranet='-1'
+LEFT OUTER JOIN imp.yy_ws_existencias ex ON ex.xempresa_id=s.xempresa_id AND ex.xarticulo_id=alt.xref_alternativa 
+WHERE conv.xempresa_conv_id = 'SCHB' 
+ AND ( CONTAINS (s.xbusqueda, '"fehling’s*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"solution*"', language 3082)  )  
+) AS DATO 
+ORDER BY xorden DESC,xmarca ASC,xindexbuscar ASC,xarticulo_id ASC
+2024-9-26//10:51:59SELECT OK: SELECT  
+xarticulo_id,
+CASE WHEN xorden>0 THEN 0 ELSE 1 END AS xorden,
+ISNULL(xdisponible,0) AS xdisponible 
+FROM (
+SELECT DISTINCT s.xarticulo_id,
+	isnull(CLI.XCANTIDAD,0) AS xorden ,
+	isnull(ex.xdisponible,0) AS xdisponible,
+ISNULL(A.N992_MARCA,'999') AS xmarca,
+CHARINDEX('Fehling’s',s.xbusqueda) as xindexbuscar
+FROM imp.n992_wc_superquery s
+INNER JOIN yy_ws_emp_conv conv ON s.xempresa_id = conv.xempresa_id
+INNER JOIN imp.pl_articulos a ON s.xempresa_id = a.xempresa_id AND s.xarticulo_id = a.xarticulo_id AND a.n992_baja != '-1' AND a.n992_descat != '-1'
+INNER JOIN pl_familias f ON f.xempresa_id=s.xempresa_id AND f.xfamilia_id=a.xfamilia_id  AND ISNULL(f.n992_linea,'00')<>'11'
+LEFT OUTER JOIN imp.yy_ws_art_cli_ano cli ON cli.XEMPRESA_ID=s.xempresa_id AND cli.XCLIENTE_ID= '00964' AND cli.XARTICULO_ID=s.xarticulo_id 
+LEFT OUTER JOIN imp.yy_ws_existencias ex ON ex.xempresa_id=s.xempresa_id AND ex.xarticulo_id=s.xarticulo_id 
+LEFT OUTER JOIN imp.pl_cli_preart pesp ON pesp.xempresa_id=s.xempresa_id AND pesp.xcliente_id='00964' AND pesp.xarticulo_id=s.xarticulo_id
+WHERE conv.xempresa_conv_id = 'SCHB' 
+AND ( (a.n992_intranet='-1')  OR (ISNULL(pesp.xprecio,0)<>0) )
+ AND ( CONTAINS (s.xbusqueda, '"fehling’s*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"solution*"', language 3082)  )  
+
+union all
+
+SELECT DISTINCT alt.xref_alternativa AS xarticulo_id,
+0 AS xorden ,
+isnull(ex.xdisponible,0) AS xdisponible,
+'999' AS xmarca,
+CHARINDEX('Fehling’s',s.xbusqueda) as xindexbuscar
+FROM imp.n992_wc_superquery s
+INNER JOIN yy_ws_emp_conv conv ON s.xempresa_id = conv.xempresa_id
+INNER JOIN yy_ref_alterna_art alt ON alt.xempresa_id=s.xempresa_id AND alt.xarticulo_id=s.xarticulo_id 
+INNER JOIN imp.pl_articulos a ON a.xempresa_id = s.xempresa_id AND a.xarticulo_id = alt.xref_alternativa AND a.n992_baja != '-1' AND a.n992_descat != '-1' AND a.n992_intranet='-1'
+LEFT OUTER JOIN imp.yy_ws_existencias ex ON ex.xempresa_id=s.xempresa_id AND ex.xarticulo_id=alt.xref_alternativa 
+WHERE conv.xempresa_conv_id = 'SCHB' 
+ AND ( CONTAINS (s.xbusqueda, '"fehling’s*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"solution*"', language 3082)  )  
+) AS DATO 
+ORDER BY xorden DESC,xmarca ASC,xindexbuscar ASC,xarticulo_id ASC
+2024-9-26//10:53:40SELECT OK: SELECT  
+xarticulo_id,
+CASE WHEN xorden>0 THEN 0 ELSE 1 END AS xorden,
+ISNULL(xdisponible,0) AS xdisponible 
+FROM (
+SELECT DISTINCT s.xarticulo_id,
+	isnull(CLI.XCANTIDAD,0) AS xorden ,
+	isnull(ex.xdisponible,0) AS xdisponible,
+ISNULL(A.N992_MARCA,'999') AS xmarca,
+CHARINDEX('Fehling',s.xbusqueda) as xindexbuscar
+FROM imp.n992_wc_superquery s
+INNER JOIN yy_ws_emp_conv conv ON s.xempresa_id = conv.xempresa_id
+INNER JOIN imp.pl_articulos a ON s.xempresa_id = a.xempresa_id AND s.xarticulo_id = a.xarticulo_id AND a.n992_baja != '-1' AND a.n992_descat != '-1'
+INNER JOIN pl_familias f ON f.xempresa_id=s.xempresa_id AND f.xfamilia_id=a.xfamilia_id  AND ISNULL(f.n992_linea,'00')<>'11'
+LEFT OUTER JOIN imp.yy_ws_art_cli_ano cli ON cli.XEMPRESA_ID=s.xempresa_id AND cli.XCLIENTE_ID= '00964' AND cli.XARTICULO_ID=s.xarticulo_id 
+LEFT OUTER JOIN imp.yy_ws_existencias ex ON ex.xempresa_id=s.xempresa_id AND ex.xarticulo_id=s.xarticulo_id 
+LEFT OUTER JOIN imp.pl_cli_preart pesp ON pesp.xempresa_id=s.xempresa_id AND pesp.xcliente_id='00964' AND pesp.xarticulo_id=s.xarticulo_id
+WHERE conv.xempresa_conv_id = 'SCHB' 
+AND ( (a.n992_intranet='-1')  OR (ISNULL(pesp.xprecio,0)<>0) )
+ AND ( CONTAINS (s.xbusqueda, '"fehling*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"solution*"', language 3082)  )  
+
+union all
+
+SELECT DISTINCT alt.xref_alternativa AS xarticulo_id,
+0 AS xorden ,
+isnull(ex.xdisponible,0) AS xdisponible,
+'999' AS xmarca,
+CHARINDEX('Fehling',s.xbusqueda) as xindexbuscar
+FROM imp.n992_wc_superquery s
+INNER JOIN yy_ws_emp_conv conv ON s.xempresa_id = conv.xempresa_id
+INNER JOIN yy_ref_alterna_art alt ON alt.xempresa_id=s.xempresa_id AND alt.xarticulo_id=s.xarticulo_id 
+INNER JOIN imp.pl_articulos a ON a.xempresa_id = s.xempresa_id AND a.xarticulo_id = alt.xref_alternativa AND a.n992_baja != '-1' AND a.n992_descat != '-1' AND a.n992_intranet='-1'
+LEFT OUTER JOIN imp.yy_ws_existencias ex ON ex.xempresa_id=s.xempresa_id AND ex.xarticulo_id=alt.xref_alternativa 
+WHERE conv.xempresa_conv_id = 'SCHB' 
+ AND ( CONTAINS (s.xbusqueda, '"fehling*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"solution*"', language 3082)  )  
+) AS DATO 
+ORDER BY xorden DESC,xmarca ASC,xindexbuscar ASC,xarticulo_id ASC
+2024-9-26//10:53:48SELECT OK: SELECT  
+xarticulo_id,
+CASE WHEN xorden>0 THEN 0 ELSE 1 END AS xorden,
+ISNULL(xdisponible,0) AS xdisponible 
+FROM (
+SELECT DISTINCT s.xarticulo_id,
+	isnull(CLI.XCANTIDAD,0) AS xorden ,
+	isnull(ex.xdisponible,0) AS xdisponible,
+ISNULL(A.N992_MARCA,'999') AS xmarca,
+CHARINDEX('Fehling',s.xbusqueda) as xindexbuscar
+FROM imp.n992_wc_superquery s
+INNER JOIN yy_ws_emp_conv conv ON s.xempresa_id = conv.xempresa_id
+INNER JOIN imp.pl_articulos a ON s.xempresa_id = a.xempresa_id AND s.xarticulo_id = a.xarticulo_id AND a.n992_baja != '-1' AND a.n992_descat != '-1'
+INNER JOIN pl_familias f ON f.xempresa_id=s.xempresa_id AND f.xfamilia_id=a.xfamilia_id  AND ISNULL(f.n992_linea,'00')<>'11'
+LEFT OUTER JOIN imp.yy_ws_art_cli_ano cli ON cli.XEMPRESA_ID=s.xempresa_id AND cli.XCLIENTE_ID= '00964' AND cli.XARTICULO_ID=s.xarticulo_id 
+LEFT OUTER JOIN imp.yy_ws_existencias ex ON ex.xempresa_id=s.xempresa_id AND ex.xarticulo_id=s.xarticulo_id 
+LEFT OUTER JOIN imp.pl_cli_preart pesp ON pesp.xempresa_id=s.xempresa_id AND pesp.xcliente_id='00964' AND pesp.xarticulo_id=s.xarticulo_id
+WHERE conv.xempresa_conv_id = 'SCHB' 
+AND ( (a.n992_intranet='-1')  OR (ISNULL(pesp.xprecio,0)<>0) )
+ AND ( CONTAINS (s.xbusqueda, '"fehling*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"solution*"', language 3082)  )  
+
+union all
+
+SELECT DISTINCT alt.xref_alternativa AS xarticulo_id,
+0 AS xorden ,
+isnull(ex.xdisponible,0) AS xdisponible,
+'999' AS xmarca,
+CHARINDEX('Fehling',s.xbusqueda) as xindexbuscar
+FROM imp.n992_wc_superquery s
+INNER JOIN yy_ws_emp_conv conv ON s.xempresa_id = conv.xempresa_id
+INNER JOIN yy_ref_alterna_art alt ON alt.xempresa_id=s.xempresa_id AND alt.xarticulo_id=s.xarticulo_id 
+INNER JOIN imp.pl_articulos a ON a.xempresa_id = s.xempresa_id AND a.xarticulo_id = alt.xref_alternativa AND a.n992_baja != '-1' AND a.n992_descat != '-1' AND a.n992_intranet='-1'
+LEFT OUTER JOIN imp.yy_ws_existencias ex ON ex.xempresa_id=s.xempresa_id AND ex.xarticulo_id=alt.xref_alternativa 
+WHERE conv.xempresa_conv_id = 'SCHB' 
+ AND ( CONTAINS (s.xbusqueda, '"fehling*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"solution*"', language 3082)  )  
+) AS DATO 
+ORDER BY xorden DESC,xmarca ASC,xindexbuscar ASC,xarticulo_id ASC
+2024-9-26//10:54:54SELECT OK: SELECT  
+xarticulo_id,
+CASE WHEN xorden>0 THEN 0 ELSE 1 END AS xorden,
+ISNULL(xdisponible,0) AS xdisponible 
+FROM (
+SELECT DISTINCT s.xarticulo_id,
+	isnull(CLI.XCANTIDAD,0) AS xorden ,
+	isnull(ex.xdisponible,0) AS xdisponible,
+ISNULL(A.N992_MARCA,'999') AS xmarca,
+CHARINDEX('Solución',s.xbusqueda) as xindexbuscar
+FROM imp.n992_wc_superquery s
+INNER JOIN yy_ws_emp_conv conv ON s.xempresa_id = conv.xempresa_id
+INNER JOIN imp.pl_articulos a ON s.xempresa_id = a.xempresa_id AND s.xarticulo_id = a.xarticulo_id AND a.n992_baja != '-1' AND a.n992_descat != '-1'
+INNER JOIN pl_familias f ON f.xempresa_id=s.xempresa_id AND f.xfamilia_id=a.xfamilia_id  AND ISNULL(f.n992_linea,'00')<>'11'
+LEFT OUTER JOIN imp.yy_ws_art_cli_ano cli ON cli.XEMPRESA_ID=s.xempresa_id AND cli.XCLIENTE_ID= '00964' AND cli.XARTICULO_ID=s.xarticulo_id 
+LEFT OUTER JOIN imp.yy_ws_existencias ex ON ex.xempresa_id=s.xempresa_id AND ex.xarticulo_id=s.xarticulo_id 
+LEFT OUTER JOIN imp.pl_cli_preart pesp ON pesp.xempresa_id=s.xempresa_id AND pesp.xcliente_id='00964' AND pesp.xarticulo_id=s.xarticulo_id
+WHERE conv.xempresa_conv_id = 'SCHB' 
+AND ( (a.n992_intranet='-1')  OR (ISNULL(pesp.xprecio,0)<>0) )
+ AND ( CONTAINS (s.xbusqueda, '"solución*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"desinfectante*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"baños*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"agua*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"ordinaria*"', language 3082)  )  
+
+union all
+
+SELECT DISTINCT alt.xref_alternativa AS xarticulo_id,
+0 AS xorden ,
+isnull(ex.xdisponible,0) AS xdisponible,
+'999' AS xmarca,
+CHARINDEX('Solución',s.xbusqueda) as xindexbuscar
+FROM imp.n992_wc_superquery s
+INNER JOIN yy_ws_emp_conv conv ON s.xempresa_id = conv.xempresa_id
+INNER JOIN yy_ref_alterna_art alt ON alt.xempresa_id=s.xempresa_id AND alt.xarticulo_id=s.xarticulo_id 
+INNER JOIN imp.pl_articulos a ON a.xempresa_id = s.xempresa_id AND a.xarticulo_id = alt.xref_alternativa AND a.n992_baja != '-1' AND a.n992_descat != '-1' AND a.n992_intranet='-1'
+LEFT OUTER JOIN imp.yy_ws_existencias ex ON ex.xempresa_id=s.xempresa_id AND ex.xarticulo_id=alt.xref_alternativa 
+WHERE conv.xempresa_conv_id = 'SCHB' 
+ AND ( CONTAINS (s.xbusqueda, '"solución*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"desinfectante*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"baños*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"agua*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"ordinaria*"', language 3082)  )  
+) AS DATO 
+ORDER BY xorden DESC,xmarca ASC,xindexbuscar ASC,xarticulo_id ASC
+2024-9-26//10:54:57SELECT OK: SELECT  
+xarticulo_id,
+CASE WHEN xorden>0 THEN 0 ELSE 1 END AS xorden,
+ISNULL(xdisponible,0) AS xdisponible 
+FROM (
+SELECT DISTINCT s.xarticulo_id,
+	isnull(CLI.XCANTIDAD,0) AS xorden ,
+	isnull(ex.xdisponible,0) AS xdisponible,
+ISNULL(A.N992_MARCA,'999') AS xmarca,
+CHARINDEX('Solución',s.xbusqueda) as xindexbuscar
+FROM imp.n992_wc_superquery s
+INNER JOIN yy_ws_emp_conv conv ON s.xempresa_id = conv.xempresa_id
+INNER JOIN imp.pl_articulos a ON s.xempresa_id = a.xempresa_id AND s.xarticulo_id = a.xarticulo_id AND a.n992_baja != '-1' AND a.n992_descat != '-1'
+INNER JOIN pl_familias f ON f.xempresa_id=s.xempresa_id AND f.xfamilia_id=a.xfamilia_id  AND ISNULL(f.n992_linea,'00')<>'11'
+LEFT OUTER JOIN imp.yy_ws_art_cli_ano cli ON cli.XEMPRESA_ID=s.xempresa_id AND cli.XCLIENTE_ID= '00964' AND cli.XARTICULO_ID=s.xarticulo_id 
+LEFT OUTER JOIN imp.yy_ws_existencias ex ON ex.xempresa_id=s.xempresa_id AND ex.xarticulo_id=s.xarticulo_id 
+LEFT OUTER JOIN imp.pl_cli_preart pesp ON pesp.xempresa_id=s.xempresa_id AND pesp.xcliente_id='00964' AND pesp.xarticulo_id=s.xarticulo_id
+WHERE conv.xempresa_conv_id = 'SCHB' 
+AND ( (a.n992_intranet='-1')  OR (ISNULL(pesp.xprecio,0)<>0) )
+ AND ( CONTAINS (s.xbusqueda, '"solución*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"desinfectante*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"baños*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"agua*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"ordinaria*"', language 3082)  )  
+
+union all
+
+SELECT DISTINCT alt.xref_alternativa AS xarticulo_id,
+0 AS xorden ,
+isnull(ex.xdisponible,0) AS xdisponible,
+'999' AS xmarca,
+CHARINDEX('Solución',s.xbusqueda) as xindexbuscar
+FROM imp.n992_wc_superquery s
+INNER JOIN yy_ws_emp_conv conv ON s.xempresa_id = conv.xempresa_id
+INNER JOIN yy_ref_alterna_art alt ON alt.xempresa_id=s.xempresa_id AND alt.xarticulo_id=s.xarticulo_id 
+INNER JOIN imp.pl_articulos a ON a.xempresa_id = s.xempresa_id AND a.xarticulo_id = alt.xref_alternativa AND a.n992_baja != '-1' AND a.n992_descat != '-1' AND a.n992_intranet='-1'
+LEFT OUTER JOIN imp.yy_ws_existencias ex ON ex.xempresa_id=s.xempresa_id AND ex.xarticulo_id=alt.xref_alternativa 
+WHERE conv.xempresa_conv_id = 'SCHB' 
+ AND ( CONTAINS (s.xbusqueda, '"solución*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"desinfectante*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"baños*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"agua*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"ordinaria*"', language 3082)  )  
+) AS DATO 
+ORDER BY xorden DESC,xmarca ASC,xindexbuscar ASC,xarticulo_id ASC
+2024-9-26//10:54:58SELECT OK: SELECT  
+xarticulo_id,
+CASE WHEN xorden>0 THEN 0 ELSE 1 END AS xorden,
+ISNULL(xdisponible,0) AS xdisponible 
+FROM (
+SELECT DISTINCT s.xarticulo_id,
+	isnull(CLI.XCANTIDAD,0) AS xorden ,
+	isnull(ex.xdisponible,0) AS xdisponible,
+ISNULL(A.N992_MARCA,'999') AS xmarca,
+CHARINDEX('Solución',s.xbusqueda) as xindexbuscar
+FROM imp.n992_wc_superquery s
+INNER JOIN yy_ws_emp_conv conv ON s.xempresa_id = conv.xempresa_id
+INNER JOIN imp.pl_articulos a ON s.xempresa_id = a.xempresa_id AND s.xarticulo_id = a.xarticulo_id AND a.n992_baja != '-1' AND a.n992_descat != '-1'
+INNER JOIN pl_familias f ON f.xempresa_id=s.xempresa_id AND f.xfamilia_id=a.xfamilia_id  AND ISNULL(f.n992_linea,'00')<>'11'
+LEFT OUTER JOIN imp.yy_ws_art_cli_ano cli ON cli.XEMPRESA_ID=s.xempresa_id AND cli.XCLIENTE_ID= '00964' AND cli.XARTICULO_ID=s.xarticulo_id 
+LEFT OUTER JOIN imp.yy_ws_existencias ex ON ex.xempresa_id=s.xempresa_id AND ex.xarticulo_id=s.xarticulo_id 
+LEFT OUTER JOIN imp.pl_cli_preart pesp ON pesp.xempresa_id=s.xempresa_id AND pesp.xcliente_id='00964' AND pesp.xarticulo_id=s.xarticulo_id
+WHERE conv.xempresa_conv_id = 'SCHB' 
+AND ( (a.n992_intranet='-1')  OR (ISNULL(pesp.xprecio,0)<>0) )
+ AND ( CONTAINS (s.xbusqueda, '"solución*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"desinfectante*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"baños*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"agua*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"ordinaria*"', language 3082)  )  
+
+union all
+
+SELECT DISTINCT alt.xref_alternativa AS xarticulo_id,
+0 AS xorden ,
+isnull(ex.xdisponible,0) AS xdisponible,
+'999' AS xmarca,
+CHARINDEX('Solución',s.xbusqueda) as xindexbuscar
+FROM imp.n992_wc_superquery s
+INNER JOIN yy_ws_emp_conv conv ON s.xempresa_id = conv.xempresa_id
+INNER JOIN yy_ref_alterna_art alt ON alt.xempresa_id=s.xempresa_id AND alt.xarticulo_id=s.xarticulo_id 
+INNER JOIN imp.pl_articulos a ON a.xempresa_id = s.xempresa_id AND a.xarticulo_id = alt.xref_alternativa AND a.n992_baja != '-1' AND a.n992_descat != '-1' AND a.n992_intranet='-1'
+LEFT OUTER JOIN imp.yy_ws_existencias ex ON ex.xempresa_id=s.xempresa_id AND ex.xarticulo_id=alt.xref_alternativa 
+WHERE conv.xempresa_conv_id = 'SCHB' 
+ AND ( CONTAINS (s.xbusqueda, '"solución*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"desinfectante*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"baños*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"agua*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"ordinaria*"', language 3082)  )  
+) AS DATO 
+ORDER BY xorden DESC,xmarca ASC,xindexbuscar ASC,xarticulo_id ASC
+2024-9-26//10:55:55SELECT OK: SELECT  
+xarticulo_id,
+CASE WHEN xorden>0 THEN 0 ELSE 1 END AS xorden,
+ISNULL(xdisponible,0) AS xdisponible 
+FROM (
+SELECT DISTINCT s.xarticulo_id,
+	isnull(CLI.XCANTIDAD,0) AS xorden ,
+	isnull(ex.xdisponible,0) AS xdisponible,
+ISNULL(A.N992_MARCA,'999') AS xmarca,
+CHARINDEX('Solución',s.xbusqueda) as xindexbuscar
+FROM imp.n992_wc_superquery s
+INNER JOIN yy_ws_emp_conv conv ON s.xempresa_id = conv.xempresa_id
+INNER JOIN imp.pl_articulos a ON s.xempresa_id = a.xempresa_id AND s.xarticulo_id = a.xarticulo_id AND a.n992_baja != '-1' AND a.n992_descat != '-1'
+INNER JOIN pl_familias f ON f.xempresa_id=s.xempresa_id AND f.xfamilia_id=a.xfamilia_id  AND ISNULL(f.n992_linea,'00')<>'11'
+LEFT OUTER JOIN imp.yy_ws_art_cli_ano cli ON cli.XEMPRESA_ID=s.xempresa_id AND cli.XCLIENTE_ID= '00964' AND cli.XARTICULO_ID=s.xarticulo_id 
+LEFT OUTER JOIN imp.yy_ws_existencias ex ON ex.xempresa_id=s.xempresa_id AND ex.xarticulo_id=s.xarticulo_id 
+LEFT OUTER JOIN imp.pl_cli_preart pesp ON pesp.xempresa_id=s.xempresa_id AND pesp.xcliente_id='00964' AND pesp.xarticulo_id=s.xarticulo_id
+WHERE conv.xempresa_conv_id = 'SCHB' 
+AND ( (a.n992_intranet='-1')  OR (ISNULL(pesp.xprecio,0)<>0) )
+ AND ( CONTAINS (s.xbusqueda, '"solución*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"desinfectante*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"baños*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"agua*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"ordinaria*"', language 3082)  )  
+
+union all
+
+SELECT DISTINCT alt.xref_alternativa AS xarticulo_id,
+0 AS xorden ,
+isnull(ex.xdisponible,0) AS xdisponible,
+'999' AS xmarca,
+CHARINDEX('Solución',s.xbusqueda) as xindexbuscar
+FROM imp.n992_wc_superquery s
+INNER JOIN yy_ws_emp_conv conv ON s.xempresa_id = conv.xempresa_id
+INNER JOIN yy_ref_alterna_art alt ON alt.xempresa_id=s.xempresa_id AND alt.xarticulo_id=s.xarticulo_id 
+INNER JOIN imp.pl_articulos a ON a.xempresa_id = s.xempresa_id AND a.xarticulo_id = alt.xref_alternativa AND a.n992_baja != '-1' AND a.n992_descat != '-1' AND a.n992_intranet='-1'
+LEFT OUTER JOIN imp.yy_ws_existencias ex ON ex.xempresa_id=s.xempresa_id AND ex.xarticulo_id=alt.xref_alternativa 
+WHERE conv.xempresa_conv_id = 'SCHB' 
+ AND ( CONTAINS (s.xbusqueda, '"solución*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"desinfectante*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"baños*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"agua*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"ordinaria*"', language 3082)  )  
+) AS DATO 
+ORDER BY xorden DESC,xmarca ASC,xindexbuscar ASC,xarticulo_id ASC
+2024-9-26//10:55:57SELECT OK: SELECT  
+xarticulo_id,
+CASE WHEN xorden>0 THEN 0 ELSE 1 END AS xorden,
+ISNULL(xdisponible,0) AS xdisponible 
+FROM (
+SELECT DISTINCT s.xarticulo_id,
+	isnull(CLI.XCANTIDAD,0) AS xorden ,
+	isnull(ex.xdisponible,0) AS xdisponible,
+ISNULL(A.N992_MARCA,'999') AS xmarca,
+CHARINDEX('Solución',s.xbusqueda) as xindexbuscar
+FROM imp.n992_wc_superquery s
+INNER JOIN yy_ws_emp_conv conv ON s.xempresa_id = conv.xempresa_id
+INNER JOIN imp.pl_articulos a ON s.xempresa_id = a.xempresa_id AND s.xarticulo_id = a.xarticulo_id AND a.n992_baja != '-1' AND a.n992_descat != '-1'
+INNER JOIN pl_familias f ON f.xempresa_id=s.xempresa_id AND f.xfamilia_id=a.xfamilia_id  AND ISNULL(f.n992_linea,'00')<>'11'
+LEFT OUTER JOIN imp.yy_ws_art_cli_ano cli ON cli.XEMPRESA_ID=s.xempresa_id AND cli.XCLIENTE_ID= '00964' AND cli.XARTICULO_ID=s.xarticulo_id 
+LEFT OUTER JOIN imp.yy_ws_existencias ex ON ex.xempresa_id=s.xempresa_id AND ex.xarticulo_id=s.xarticulo_id 
+LEFT OUTER JOIN imp.pl_cli_preart pesp ON pesp.xempresa_id=s.xempresa_id AND pesp.xcliente_id='00964' AND pesp.xarticulo_id=s.xarticulo_id
+WHERE conv.xempresa_conv_id = 'SCHB' 
+AND ( (a.n992_intranet='-1')  OR (ISNULL(pesp.xprecio,0)<>0) )
+ AND ( CONTAINS (s.xbusqueda, '"solución*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"desinfectante*"', language 3082)  )  
+
+union all
+
+SELECT DISTINCT alt.xref_alternativa AS xarticulo_id,
+0 AS xorden ,
+isnull(ex.xdisponible,0) AS xdisponible,
+'999' AS xmarca,
+CHARINDEX('Solución',s.xbusqueda) as xindexbuscar
+FROM imp.n992_wc_superquery s
+INNER JOIN yy_ws_emp_conv conv ON s.xempresa_id = conv.xempresa_id
+INNER JOIN yy_ref_alterna_art alt ON alt.xempresa_id=s.xempresa_id AND alt.xarticulo_id=s.xarticulo_id 
+INNER JOIN imp.pl_articulos a ON a.xempresa_id = s.xempresa_id AND a.xarticulo_id = alt.xref_alternativa AND a.n992_baja != '-1' AND a.n992_descat != '-1' AND a.n992_intranet='-1'
+LEFT OUTER JOIN imp.yy_ws_existencias ex ON ex.xempresa_id=s.xempresa_id AND ex.xarticulo_id=alt.xref_alternativa 
+WHERE conv.xempresa_conv_id = 'SCHB' 
+ AND ( CONTAINS (s.xbusqueda, '"solución*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"desinfectante*"', language 3082)  )  
+) AS DATO 
+ORDER BY xorden DESC,xmarca ASC,xindexbuscar ASC,xarticulo_id ASC
+2024-9-26//10:55:58SELECT OK: SELECT  
+xarticulo_id,
+CASE WHEN xorden>0 THEN 0 ELSE 1 END AS xorden,
+ISNULL(xdisponible,0) AS xdisponible 
+FROM (
+SELECT DISTINCT s.xarticulo_id,
+	isnull(CLI.XCANTIDAD,0) AS xorden ,
+	isnull(ex.xdisponible,0) AS xdisponible,
+ISNULL(A.N992_MARCA,'999') AS xmarca,
+CHARINDEX('Solución',s.xbusqueda) as xindexbuscar
+FROM imp.n992_wc_superquery s
+INNER JOIN yy_ws_emp_conv conv ON s.xempresa_id = conv.xempresa_id
+INNER JOIN imp.pl_articulos a ON s.xempresa_id = a.xempresa_id AND s.xarticulo_id = a.xarticulo_id AND a.n992_baja != '-1' AND a.n992_descat != '-1'
+INNER JOIN pl_familias f ON f.xempresa_id=s.xempresa_id AND f.xfamilia_id=a.xfamilia_id  AND ISNULL(f.n992_linea,'00')<>'11'
+LEFT OUTER JOIN imp.yy_ws_art_cli_ano cli ON cli.XEMPRESA_ID=s.xempresa_id AND cli.XCLIENTE_ID= '00964' AND cli.XARTICULO_ID=s.xarticulo_id 
+LEFT OUTER JOIN imp.yy_ws_existencias ex ON ex.xempresa_id=s.xempresa_id AND ex.xarticulo_id=s.xarticulo_id 
+LEFT OUTER JOIN imp.pl_cli_preart pesp ON pesp.xempresa_id=s.xempresa_id AND pesp.xcliente_id='00964' AND pesp.xarticulo_id=s.xarticulo_id
+WHERE conv.xempresa_conv_id = 'SCHB' 
+AND ( (a.n992_intranet='-1')  OR (ISNULL(pesp.xprecio,0)<>0) )
+ AND ( CONTAINS (s.xbusqueda, '"solución*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"desinfectante*"', language 3082)  )  
+
+union all
+
+SELECT DISTINCT alt.xref_alternativa AS xarticulo_id,
+0 AS xorden ,
+isnull(ex.xdisponible,0) AS xdisponible,
+'999' AS xmarca,
+CHARINDEX('Solución',s.xbusqueda) as xindexbuscar
+FROM imp.n992_wc_superquery s
+INNER JOIN yy_ws_emp_conv conv ON s.xempresa_id = conv.xempresa_id
+INNER JOIN yy_ref_alterna_art alt ON alt.xempresa_id=s.xempresa_id AND alt.xarticulo_id=s.xarticulo_id 
+INNER JOIN imp.pl_articulos a ON a.xempresa_id = s.xempresa_id AND a.xarticulo_id = alt.xref_alternativa AND a.n992_baja != '-1' AND a.n992_descat != '-1' AND a.n992_intranet='-1'
+LEFT OUTER JOIN imp.yy_ws_existencias ex ON ex.xempresa_id=s.xempresa_id AND ex.xarticulo_id=alt.xref_alternativa 
+WHERE conv.xempresa_conv_id = 'SCHB' 
+ AND ( CONTAINS (s.xbusqueda, '"solución*"', language 3082)  )  AND ( CONTAINS (s.xbusqueda, '"desinfectante*"', language 3082)  )  
+) AS DATO 
+ORDER BY xorden DESC,xmarca ASC,xindexbuscar ASC,xarticulo_id ASC

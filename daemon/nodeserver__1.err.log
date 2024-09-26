@@ -1,0 +1,107 @@
+(node:16904) Warning: Accessing non-existent property 'param' of module exports inside circular dependency
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16904) [DEP0123] DeprecationWarning: Setting the TLS ServerName to an IP address is not permitted by RFC 6066. This will be ignored in a future version.
+(node:12944) Warning: Accessing non-existent property 'param' of module exports inside circular dependency
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:12944) [DEP0123] DeprecationWarning: Setting the TLS ServerName to an IP address is not permitted by RFC 6066. This will be ignored in a future version.
+C:\webservice\api-rest-node\node_modules\mssql\lib\tedious\connection-pool.js:71
+          err = new ConnectionError(err)
+                ^
+
+ConnectionError: Error de inicio de sesión del usuario 'imp'.
+    at C:\webservice\api-rest-node\node_modules\mssql\lib\tedious\connection-pool.js:71:17
+    at Connection.onConnect (C:\webservice\api-rest-node\node_modules\mssql\node_modules\tedious\lib\connection.js:1043:9)
+    at Object.onceWrapper (node:events:510:26)
+    at Connection.emit (node:events:390:28)
+    at Connection.emit (C:\webservice\api-rest-node\node_modules\mssql\node_modules\tedious\lib\connection.js:1071:18)
+    at Parser.<anonymous> (C:\webservice\api-rest-node\node_modules\mssql\node_modules\tedious\lib\connection.js:2832:20)
+    at Object.onceWrapper (node:events:509:28)
+    at Parser.emit (node:events:390:28)
+    at Readable.<anonymous> (C:\webservice\api-rest-node\node_modules\mssql\node_modules\tedious\lib\token\token-stream-parser.js:34:12)
+    at Readable.emit (node:events:390:28) {
+  code: 'ELOGIN',
+  originalError: ConnectionError: Error de inicio de sesión del usuario 'imp'.
+      at ConnectionError (C:\webservice\api-rest-node\node_modules\mssql\node_modules\tedious\lib\errors.js:13:12)
+      at Parser.<anonymous> (C:\webservice\api-rest-node\node_modules\mssql\node_modules\tedious\lib\connection.js:1194:51)
+      at Parser.emit (node:events:390:28)
+      at Readable.<anonymous> (C:\webservice\api-rest-node\node_modules\mssql\node_modules\tedious\lib\token\token-stream-parser.js:27:14)
+      at Readable.emit (node:events:390:28)
+      at addChunk (node:internal/streams/readable:315:12)
+      at readableAddChunk (node:internal/streams/readable:289:9)
+      at Readable.push (node:internal/streams/readable:228:10)
+      at next (node:internal/streams/from:98:31)
+      at processTicksAndRejections (node:internal/process/task_queues:96:5) {
+    code: 'ELOGIN'
+  }
+}
+(node:12892) Warning: Accessing non-existent property 'param' of module exports inside circular dependency
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:12892) [DEP0123] DeprecationWarning: Setting the TLS ServerName to an IP address is not permitted by RFC 6066. This will be ignored in a future version.
+C:\webservice\api-rest-node\node_modules\mssql\lib\tedious\connection-pool.js:71
+          err = new ConnectionError(err)
+                ^
+
+ConnectionError: Error de inicio de sesión del usuario 'imp'.
+    at C:\webservice\api-rest-node\node_modules\mssql\lib\tedious\connection-pool.js:71:17
+    at Connection.onConnect (C:\webservice\api-rest-node\node_modules\mssql\node_modules\tedious\lib\connection.js:1043:9)
+    at Object.onceWrapper (node:events:510:26)
+    at Connection.emit (node:events:390:28)
+    at Connection.emit (C:\webservice\api-rest-node\node_modules\mssql\node_modules\tedious\lib\connection.js:1071:18)
+    at Parser.<anonymous> (C:\webservice\api-rest-node\node_modules\mssql\node_modules\tedious\lib\connection.js:2832:20)
+    at Object.onceWrapper (node:events:509:28)
+    at Parser.emit (node:events:390:28)
+    at Readable.<anonymous> (C:\webservice\api-rest-node\node_modules\mssql\node_modules\tedious\lib\token\token-stream-parser.js:34:12)
+    at Readable.emit (node:events:390:28) {
+  code: 'ELOGIN',
+  originalError: ConnectionError: Error de inicio de sesión del usuario 'imp'.
+      at ConnectionError (C:\webservice\api-rest-node\node_modules\mssql\node_modules\tedious\lib\errors.js:13:12)
+      at Parser.<anonymous> (C:\webservice\api-rest-node\node_modules\mssql\node_modules\tedious\lib\connection.js:1194:51)
+      at Parser.emit (node:events:390:28)
+      at Readable.<anonymous> (C:\webservice\api-rest-node\node_modules\mssql\node_modules\tedious\lib\token\token-stream-parser.js:27:14)
+      at Readable.emit (node:events:390:28)
+      at addChunk (node:internal/streams/readable:315:12)
+      at readableAddChunk (node:internal/streams/readable:289:9)
+      at Readable.push (node:internal/streams/readable:228:10)
+      at next (node:internal/streams/from:98:31)
+      at processTicksAndRejections (node:internal/process/task_queues:96:5) {
+    code: 'ELOGIN'
+  }
+}
+(node:436) Warning: Accessing non-existent property 'param' of module exports inside circular dependency
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:436) [DEP0123] DeprecationWarning: Setting the TLS ServerName to an IP address is not permitted by RFC 6066. This will be ignored in a future version.
+C:\webservice\api-rest-node\node_modules\mssql\lib\tedious\connection-pool.js:71
+          err = new ConnectionError(err)
+                ^
+
+ConnectionError: Error de inicio de sesión del usuario 'imp'.
+    at C:\webservice\api-rest-node\node_modules\mssql\lib\tedious\connection-pool.js:71:17
+    at Connection.onConnect (C:\webservice\api-rest-node\node_modules\mssql\node_modules\tedious\lib\connection.js:1043:9)
+    at Object.onceWrapper (node:events:510:26)
+    at Connection.emit (node:events:390:28)
+    at Connection.emit (C:\webservice\api-rest-node\node_modules\mssql\node_modules\tedious\lib\connection.js:1071:18)
+    at Parser.<anonymous> (C:\webservice\api-rest-node\node_modules\mssql\node_modules\tedious\lib\connection.js:2832:20)
+    at Object.onceWrapper (node:events:509:28)
+    at Parser.emit (node:events:390:28)
+    at Readable.<anonymous> (C:\webservice\api-rest-node\node_modules\mssql\node_modules\tedious\lib\token\token-stream-parser.js:34:12)
+    at Readable.emit (node:events:390:28) {
+  code: 'ELOGIN',
+  originalError: ConnectionError: Error de inicio de sesión del usuario 'imp'.
+      at ConnectionError (C:\webservice\api-rest-node\node_modules\mssql\node_modules\tedious\lib\errors.js:13:12)
+      at Parser.<anonymous> (C:\webservice\api-rest-node\node_modules\mssql\node_modules\tedious\lib\connection.js:1194:51)
+      at Parser.emit (node:events:390:28)
+      at Readable.<anonymous> (C:\webservice\api-rest-node\node_modules\mssql\node_modules\tedious\lib\token\token-stream-parser.js:27:14)
+      at Readable.emit (node:events:390:28)
+      at addChunk (node:internal/streams/readable:315:12)
+      at readableAddChunk (node:internal/streams/readable:289:9)
+      at Readable.push (node:internal/streams/readable:228:10)
+      at next (node:internal/streams/from:98:31)
+      at processTicksAndRejections (node:internal/process/task_queues:96:5) {
+    code: 'ELOGIN'
+  }
+}
+(node:18328) Warning: Accessing non-existent property 'param' of module exports inside circular dependency
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:18328) [DEP0123] DeprecationWarning: Setting the TLS ServerName to an IP address is not permitted by RFC 6066. This will be ignored in a future version.
+(node:4380) [DEP0123] DeprecationWarning: Setting the TLS ServerName to an IP address is not permitted by RFC 6066. This will be ignored in a future version.
+(Use `node --trace-deprecation ...` to show where the warning was created)
