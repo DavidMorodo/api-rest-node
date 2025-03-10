@@ -1541,7 +1541,7 @@ reset_password: async function (req, res) {
                             });
                         };    
                     };
-
+                    //prueba de github 9:35
                     
                     // reemplazamos el primer campo de busqueda para poder ordenar la select.    
                     selectResultado = await selectResultado.replaceAll("{xwhere}",clausulaWhere);        
