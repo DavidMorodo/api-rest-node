@@ -25,3 +25,132 @@
 2024-09-18 08:42:12 - Finished nodeserver__1.exe
 2024-09-25 17:53:26 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
 2024-09-25 17:53:26 - Started 13276
+2024-09-27 11:59:52 - Stopping nodeserver__1.exe
+2024-09-27 11:59:52 - ProcessKill 13276
+2024-09-27 11:59:52 - Finished nodeserver__1.exe
+2024-10-23 17:19:36 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2024-10-23 17:19:36 - Started 14936
+2024-10-23 17:31:16 - Stopping nodeserver__1.exe
+2024-10-23 17:31:16 - ProcessKill 14936
+2024-10-23 17:31:16 - Finished nodeserver__1.exe
+2024-10-23 18:14:42 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2024-10-23 18:14:42 - Started 17824
+2024-10-23 18:15:46 - Stopping nodeserver__1.exe
+2024-10-23 18:15:46 - ProcessKill 17824
+2024-10-23 18:15:46 - Finished nodeserver__1.exe
+2024-10-23 18:15:51 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2024-10-23 18:15:51 - Started 7656
+2024-10-24 10:15:34 - Stopping nodeserver__1.exe
+2024-10-24 10:15:34 - ProcessKill 7656
+2024-10-24 10:15:34 - Finished nodeserver__1.exe
+2024-10-25 11:38:42 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2024-10-25 11:38:42 - Started 16152
+2024-10-29 12:31:21 - Stopping nodeserver__1.exe
+2024-10-29 12:31:21 - ProcessKill 16152
+2024-10-29 12:31:21 - Finished nodeserver__1.exe
+2024-10-29 16:14:08 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2024-10-29 16:14:08 - Started 13872
+2024-10-29 16:14:31 - Stopping nodeserver__1.exe
+2024-10-29 16:14:31 - ProcessKill 13872
+2024-10-29 16:14:31 - Finished nodeserver__1.exe
+2024-10-29 16:14:33 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2024-10-29 16:14:33 - Started 15944
+2024-10-29 16:14:49 - Stopping nodeserver__1.exe
+2024-10-29 16:14:49 - ProcessKill 15944
+2024-10-29 16:14:49 - Finished nodeserver__1.exe
+2024-11-03 19:38:59 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2024-11-03 19:38:59 - Started 8164
+2024-11-05 10:23:53 - Stopping nodeserver__1.exe
+2024-11-05 10:23:53 - ProcessKill 8164
+2024-11-05 10:23:53 - Finished nodeserver__1.exe
+2024-11-05 10:28:02 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2024-11-05 10:28:02 - Started 7784
+2024-11-05 10:29:24 - Stopping nodeserver__1.exe
+2024-11-05 10:29:24 - ProcessKill 7784
+2024-11-05 10:29:24 - Finished nodeserver__1.exe
+2024-11-05 16:46:47 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2024-11-05 16:46:47 - Started 9020
+2024-11-08 13:47:08 - Stopping nodeserver__1.exe
+2024-11-08 13:47:08 - ProcessKill 9020
+2024-11-08 13:47:08 - Finished nodeserver__1.exe
+2024-11-08 17:50:10 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2024-11-08 17:50:10 - Started 13984
+2024-11-25 12:39:24 - Stopping nodeserver__1.exe
+2024-11-25 12:39:24 - ProcessKill 13984
+2024-11-25 12:39:24 - Finished nodeserver__1.exe
+2024-12-10 08:38:05 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2024-12-10 08:38:05 - Started 19764
+2024-12-10 08:41:17 - Stopping nodeserver__1.exe
+2024-12-10 08:41:17 - ProcessKill 19764
+2024-12-10 08:41:17 - Finished nodeserver__1.exe
+2024-12-10 08:41:20 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2024-12-10 08:41:20 - Started 18616
+2024-12-10 13:20:08 - Stopping nodeserver__1.exe
+2024-12-10 13:20:08 - ProcessKill 18616
+2024-12-10 13:20:08 - Finished nodeserver__1.exe
+2024-12-13 13:23:09 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2024-12-13 13:23:09 - Started 11144
+2024-12-16 15:54:02 - Stopping nodeserver__1.exe
+2024-12-16 15:54:02 - ProcessKill 11144
+2024-12-16 15:54:02 - Finished nodeserver__1.exe
+2024-12-19 10:52:08 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2024-12-19 10:52:08 - Started 15628
+2025-01-13 09:14:32 - Stopping nodeserver__1.exe
+2025-01-13 09:14:32 - Finished nodeserver__1.exe
+2025-01-13 14:58:46 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2025-01-13 14:58:46 - Started 20016
+2025-01-14 08:56:18 - Stopping nodeserver__1.exe
+2025-01-14 08:56:18 - ProcessKill 20016
+2025-01-14 08:56:18 - Finished nodeserver__1.exe
+2025-01-14 11:33:36 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2025-01-14 11:33:36 - Started 724
+2025-01-28 08:52:59 - Stopping nodeserver__1.exe
+2025-01-28 08:52:59 - ProcessKill 724
+2025-01-28 08:52:59 - Finished nodeserver__1.exe
+2025-01-29 08:37:37 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2025-01-29 08:37:37 - Started 22116
+2025-01-29 08:38:44 - Stopping nodeserver__1.exe
+2025-01-29 08:38:44 - ProcessKill 22116
+2025-01-29 08:38:44 - Finished nodeserver__1.exe
+2025-01-29 08:38:48 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2025-01-29 08:38:48 - Started 22356
+2025-02-06 13:12:03 - Stopping nodeserver__1.exe
+2025-02-06 13:12:03 - ProcessKill 22356
+2025-02-06 13:12:03 - Finished nodeserver__1.exe
+2025-02-06 13:12:06 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2025-02-06 13:12:06 - Started 23756
+2025-02-17 17:38:07 - Stopping nodeserver__1.exe
+2025-02-17 17:38:07 - ProcessKill 23756
+2025-02-17 17:38:07 - Finished nodeserver__1.exe
+2025-02-19 16:47:31 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2025-02-19 16:47:31 - Started 22712
+2025-02-24 18:07:24 - Stopping nodeserver__1.exe
+2025-02-24 18:07:24 - ProcessKill 22712
+2025-02-24 18:07:24 - Finished nodeserver__1.exe
+2025-02-24 18:29:16 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2025-02-24 18:29:16 - Started 5448
+2025-02-24 18:30:25 - Stopping nodeserver__1.exe
+2025-02-24 18:30:25 - ProcessKill 5448
+2025-02-24 18:30:25 - Finished nodeserver__1.exe
+2025-02-24 18:30:27 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2025-02-24 18:30:27 - Started 15908
+2025-02-25 10:41:44 - Stopping nodeserver__1.exe
+2025-02-25 10:41:44 - ProcessKill 15908
+2025-02-25 10:41:44 - Finished nodeserver__1.exe
+2025-02-25 12:47:33 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2025-02-25 12:47:33 - Started 19596
+2025-02-25 12:47:53 - Stopping nodeserver__1.exe
+2025-02-25 12:47:53 - ProcessKill 19596
+2025-02-25 12:47:53 - Finished nodeserver__1.exe
+2025-02-25 12:47:59 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2025-02-25 12:47:59 - Started 23872
+2025-02-25 13:36:42 - Stopping nodeserver__1.exe
+2025-02-25 13:36:42 - ProcessKill 23872
+2025-02-25 13:36:42 - Finished nodeserver__1.exe
+2025-02-28 13:48:16 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2025-02-28 13:48:16 - Started 24008
+2025-03-06 09:40:36 - Stopping nodeserver__1.exe
+2025-03-06 09:40:36 - ProcessKill 24008
+2025-03-06 09:40:36 - Finished nodeserver__1.exe
+2025-03-06 09:40:38 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2025-03-06 09:40:38 - Started 22876

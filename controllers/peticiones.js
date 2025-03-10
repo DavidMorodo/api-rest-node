@@ -7,10 +7,9 @@ const axios = require('axios');
 var generator = require('generate-password');
 const CryptoJS = require('crypto-js');
 const cifrado = require('../services/cifrados.js');
-//var conectar = require('./conexiones.js');
 
 //Requires base de datos
-const { sqlConfig,EkonSqlConfig,EkonSqlClaranet } = require('../keys');
+const { sqlConfig,EkonSqlConfig,EkonSqlClaranet,sqlWeb } = require('../keys');
 const sql = require('mssql');
 const { assing_secondary_client } = require('../querys/querys');
 const e = require('express');
@@ -20,19 +19,33 @@ const pool1 = new sql.ConnectionPool(sqlConfig);
 const pool2 = new sql.ConnectionPool(EkonSqlConfig);
 const pool3 = new sql.ConnectionPool(EkonSqlClaranet);
 const pool32 = new sql.ConnectionPool(EkonSqlConfig);
+const poolWeb = new sql.ConnectionPool(sqlWeb);
+const limiteRegistrosBusqueda = 50000;
 var hora = new Date().getHours();
 var horaInicio = 0;
-var horaFin = 3;
-var pool1Connect = pool1.connect();
-var pool2Connect = pool2.connect();
+var horaFin = -1;
+var pool1Connect = pool1.connect()
+    .catch((error) =>{
+    pool1.close();
+    console.log('Ha fallando pool1');
+});
+var pool2Connect = pool2.connect()    
+    .catch((error) =>{
+    pool2.close();
+    console.log('Ha fallando pool2');
+});
 var pool3Connect = pool3.connect()
     .catch((error) =>{
         pool3.close();
         pool3Connect = pool32.connect()
         console.log('Ha fallando pool3');
     });
-
-
+var poolWebConnect = poolWeb.connect()
+    .catch((error) =>{
+        poolWeb.close();
+        poolWebConnect = poolWeb.connect()
+        console.log('Ha fallando poolWeb');
+    });
 
 var controller = {
     cifrado: function (req, res) {
@@ -58,8 +71,7 @@ var controller = {
     descifrado: async function (req, res) {
         //console.log(fecha_log() +  "descifrado");
         try{
-            var params = req.body;
-           
+            var params = req.body;          
             var paramCifrado = params.cifrado;
             //console.log(fecha_log() +  "PARAMETRO DE CIFRADO? "+params.cifrado);
             //const unciphered = await cifrado.descifrar(paramCifrado, "6MuOzKdenNKdNbmbW8i3ywr3t3OWgER2");
@@ -69,7 +81,7 @@ var controller = {
                 descifrado: descifrar_password_basedatos
             }); 
         } catch (err) {
-            console.error(fecha_log() + ' SQL error', err);
+            console.error(fecha_log() + ' Descifrado error', err);
             return res.status(500).send({
                 message: "Error en la peticion de descifrar",
             });
@@ -98,8 +110,7 @@ var controller = {
         var obj = req.body;
         var json = obj['yyws:insertar_ori']['yyws:json'];
         var bodyStr = JSON.stringify(json);
-
-        //Formateo del texto para coger solo el json
+       //Formateo del texto para coger solo el json
 
         //Eliminar 3 primeros caracteres innecesarios
         bodyStr = bodyStr.replace(bodyStr.substring(0, 3), "");
@@ -127,7 +138,7 @@ var controller = {
                     message: "Value Store Success"
                 });
             } catch (err) {
-                console.error(fecha_log() + ' SQL error', err);
+                console.error(fecha_log() + ' SQL ADD METHOD', err);
                 return res.status(500).send({
                     message: "Error en la peticion SQL",
                 });
@@ -233,6 +244,7 @@ var controller = {
     //David. 3-2-2023
     console.log(fecha_log() +  "actualizar_usuario");
     var params = req.body;
+    //console.log (params);
     //Validamos que existan los parametros
     //Convierto el req.body a texto para buscar los parametros con hasOwnProperty y poder verificar que existen
     var cadena_params = JSON.parse(JSON.stringify(req.body));
@@ -255,6 +267,7 @@ var controller = {
     var xnombre = !validator.isEmpty(params.xnombre);
     var xapellidos = !validator.isEmpty(params.xapellidos);
     var xemail = !validator.isEmpty(params.xemail);   
+ 
      if (cadena_params.hasOwnProperty('xemail_responsable')){
         var xemail_responsable = !validator.isEmpty(Object.is(params.xemail_responsable,null)?params.xemail:params.xemail_responsable);
     }
@@ -262,6 +275,12 @@ var controller = {
     for (var i=1;i<params.xemail_pedidos.length;i++){
         xemail_pedidos += ";" + cadena_params.xemail_pedidos[i];
     }
+
+    var xemail_notificaciones = cadena_params.xemail_notificaciones[0];  
+    for (var i=1;i<params.xemail_notificaciones.length;i++){
+        xemail_notificaciones += ";" + cadena_params.xemail_notificaciones[i];
+    }
+
     if(validar_username && validar_empresa && validar_perfil && validar_cliente && xnombre && xapellidos && xemail && xemail_pedidos){
         var username = params.xusuario.toLowerCase();
         try{
@@ -275,7 +294,7 @@ var controller = {
             }else{
                 //Actualizar usuario en la base de datos
                 try{
-                    await queryfunction.update_user_datos_v2 (params.xempresa_id,  params.xcliente_id, params.xusuario, params.xrol.toLowerCase(),  params.xperfil.toLowerCase(),params.xemail, params.xemail_responsable,params.xnombre,params.xapellidos, xemail_pedidos);
+                    await queryfunction.update_user_datos_v2 (params.xempresa_id,  params.xcliente_id, params.xusuario, params.xrol.toLowerCase(),  params.xperfil.toLowerCase(),params.xemail, params.xemail_responsable,params.xnombre,params.xapellidos, xemail_pedidos,xemail_notificaciones);
                    
                     return res.status(200).send({
                         status: 'Success',
@@ -505,8 +524,7 @@ reset_password: async function (req, res) {
                     console.log(fecha_log() +  "Clientes:  :");
                     console.log(fecha_log() +  clientes);
                     usersbyclient[indexEncontrado].clientes = clientes;
-                }else{
-                    
+                }else{                 
                     const user = {
                         xusuario: user_query.xusuario,
                         clientes:[user_query.xcliente_id_secundario]
@@ -592,9 +610,7 @@ reset_password: async function (req, res) {
                             status: "400",
                             message: "Error Interno"
                         })
-                    }
-                    
-                    
+                    }        
                 }
                     
             }catch(err){
@@ -614,7 +630,6 @@ reset_password: async function (req, res) {
    },
 
      login: async function (req, res) {
-        //console.log(fecha_log() +  "login");
         //Recoger los parametros de la peticion
         var params = req.body;
         //Validamos que existan los parametros
@@ -677,9 +692,6 @@ reset_password: async function (req, res) {
                 //Comprobar la contraseña (Coincidencia de nombre de usuario / password (Bcrypt))
                 const descifrar_password_basedatos =  await cifrado.descifrar(password_usuario, "6MuOzKdenNKdNbmbW8i3ywr3t3OWgER2");
                 const descifrar_password_parametros =  await cifrado.descifrar(params.password, "6MuOzKdenNKdNbmbW8i3ywr3t3OWgER2");
-                //console.log(fecha_log() +  "Pass base de datos: " + descifrar_password_basedatos.toString(CryptoJS.enc.Utf8) );
-                //console.log(fecha_log() +  "Pass parametros: " + descifrar_password_parametros.toString(CryptoJS.enc.Utf8) );
-                //console.log(fecha_log() +  params.password);
                 if (descifrar_password_basedatos.toString(CryptoJS.enc.Utf8) == descifrar_password_parametros.toString(CryptoJS.enc.Utf8)) {
                 //if (descifrar_password_basedatos.toString(CryptoJS.enc.Utf8) == params.password) {
                     //console.log(fecha_log() +  "IGUALES");
@@ -726,57 +738,39 @@ reset_password: async function (req, res) {
             }
             //Si falla la peticion sql envio el error
         } catch (err) {
-            console.error(fecha_log() + ' SQL error', err);
+            console.error(fecha_log() + ' Login error', err);
             return res.status(500).send({
                 status: "500",
                 ws: "PETICION LOGIN",
                 error: "Error Interno en la peticion"
             });
         }
-    },
-
- 
+    }, 
 
     //BUENO :: NO TOCARR
     ws_intranet_consultas_post: async function (req, res) {
         //David. 30_8_2024. añadimos un control horario para el pool1. Entre las 0 y las 6 el sistema accederá a Claranet.
         //OJO Pool 2 es BBDD Real para grabar resultados. lo ha de hacer en PROD.
-       // try{
         hora = new Date().getHours();
         var request = pool1.request(); // o: new sql.Request(pool1)
         if (hora >= horaInicio && hora <= horaFin){
             request = pool3.request(); // o: new sql.Request(pool1)
             //console.log(fecha_log() + "-Conectado a la base datos de CLARANET." + (await pool3Connect).connected)
-        }else{
-            //console.log(fecha_log() + "-Conectado a la base de datos de OFICINA REPLICA ." + (await pool1Connect).connected)
-        }
-
-       
-            //console.log(fecha_log() +  "BODY: "+JSON.stringify(req.body));
-       /* } catch (err) {
-            console.error(fecha_log() + ' Error conexion con Claranet', err);
-            request = pool1.request();
-           // return res.status(500).send({
-            //    status: "500", ws, error: "Error de Josep"
-            //});
-        }
-        */
+        };
         var paramsHeader = req.headers;
         var paramsBody = req.body;
         
         const ws = paramsBody.ws;
         const xempresa_id = paramsBody.xempresa_id;
         const max_registros = paramsBody.max_registros;
-
-        //console.log(fecha_log() +  "ws: " + ws);
-
+        //console.log ("WS:" + ws);
         //buscamos la select en la tabla de parametros
         if (ws != null && xempresa_id != null) {
             var errorString ='';
             try {
                 //const request = pool1.request(); // o: new sql.Request(pool1)
-                const consultaSqlWS = "SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in FROM yy_ws_intranet WHERE xempresa_id = '" + xempresa_id + "' AND xquery = '" + ws + "';";
-                
+                const consultaSqlWS = "SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = '" + xempresa_id + "' AND xquery = '" + ws + "';";
+                console.log ("SQL:" + consultaSqlWS );
                 const resultadoConsultaSql = await request.query(consultaSqlWS);
                 //console.log(fecha_log() +  "TOTAL DE FILAS: " + resultadoConsultaSql.recordsets[0].length);
                 if (resultadoConsultaSql.recordsets[0].length == 0) {
@@ -784,7 +778,7 @@ reset_password: async function (req, res) {
                         status: "400", ws, error: "Peticion incorrecta"
                     });
                 }
-
+                var xcontador = resultadoConsultaSql.recordsets[0][0].xcontador;
                 var selectResultado = resultadoConsultaSql.recordsets[0][0].xconsulta;
                 var parametrosResultado = resultadoConsultaSql.recordsets[0][0].xparametros;
                 var wsEkon = resultadoConsultaSql.recordsets[0][0].xws_ekon;
@@ -795,13 +789,14 @@ reset_password: async function (req, res) {
                  var camposTipoInSplit = camposTipoIn != null ? camposTipoIn.split(",") : '';
                  //parametros de url en json
                  const jsonParametrosBody = JSON.parse(JSON.stringify(paramsBody));
-
                  //comprobar que estan esos parametros en url
                  const mapaParametros = new Map();
+                
                  for (var param in parametrosResultadoSplit) {	
                     if (jsonParametrosBody[parametrosResultadoSplit[param]] != null) {	
-                        //console.log(fecha_log() +  parametrosResultadoSplit[param] + ' --- ' + jsonParametrosBody[parametrosResultadoSplit[param]]);	
+                        console.log(fecha_log() +  parametrosResultadoSplit[param] + ' --- ' + jsonParametrosBody[parametrosResultadoSplit[param]]);	
                         if(camposTipoInSplit.includes(parametrosResultadoSplit[param])){	
+                            console.log(fecha_log() + "camposTipoInSplit: " + jsonParametrosBody[parametrosResultadoSplit[param]] );
                             var d = "(";	
                             for(var i=0; i<jsonParametrosBody[parametrosResultadoSplit[param]].length; i++){	
                                 d+="'"+jsonParametrosBody[parametrosResultadoSplit[param]][i]+"',";	
@@ -824,12 +819,11 @@ reset_password: async function (req, res) {
                         });	
                     }	
                 }	
-
-                //console.log(fecha_log() +  'SELECT: '+selectResultado);
+                console.log(fecha_log() +  'SELECT: '+selectResultado);
                 if (wsEkon == '-1') {
-                    console.log(fecha_log() + 'WS: ' + ws);
+                    //console.log(fecha_log() + 'WS: ' + ws);
                     //llamada aun WS de Ekon donde le enviamos parametros y el mismo responde
-                    console.time();
+                    //console.time();
                     var config = {
                         method: 'POST',
                         url: selectResultado,
@@ -844,7 +838,7 @@ reset_password: async function (req, res) {
                     let respuesta = [];
                     respuesta.push(axiosresp.data);//JSON.stringify(respuesta.data);
                     //control_precios(req,200); //19/09/24 anulamos el control de precios. el error lo generaba la replica nueva.
-                    console.timeEnd();
+                   // console.timeEnd();
                     return res.status(200).send({
                         status: "200",
                         ws,
@@ -852,7 +846,6 @@ reset_password: async function (req, res) {
                     });
                    
                 } else {
-
                     //sustituimos el maximos de registros si lo hay
                     var registros = 0;
                     if(max_registros != null && max_registros != ''){
@@ -875,22 +868,23 @@ reset_password: async function (req, res) {
                     
                     if(camposObjeto != null && camposObjeto != ''){
                         //leer campos objeto que hay en el campo "camposObbjeto"
-                        var camposObjetoSplit = camposObjeto != null ? camposObjeto.split(",") : '';
-                        
+                        var camposObjetoSplit = camposObjeto != null ? camposObjeto.split(",") : '';     
                         for(var i=0; i<respuesta.length; i++){
                             for (var r in respuesta[i]) {
                                 if(camposObjetoSplit.includes(r)){
-                                    var pattern = /[\t]+/g;
-                                    errorString = respuesta[i] +' >>>>><<<<< '+ respuesta[i][r];
-                                    //console.log(fecha_log() +  'ANTES: '+errorString);
                                     if(respuesta[i][r] != null){
-                                     respuesta[i][r] = JSON.parse(respuesta[i][r].replaceAll('\n', ' ').replaceAll('\t','').replaceAll('\\','').replaceAll('\\\\','').replaceAll('\r', ' '));
-                                    } //console.log(fecha_log() +  'DESPUES: '+respuesta[i][r]);
+                                        if (xcontador == '-1'){
+                                        respuesta[i][r] = JSON.parse(respuesta[i][r].replaceAll('\n', ' ').replaceAll('\\','').replaceAll('\t','').replaceAll('\\\\','').replaceAll('\r', ' '));
+                                        }else{
+                                        respuesta[i][r] = JSON.parse(respuesta[i][r].replaceAll('\n', ' ').replaceAll('\t',''))
+                                        }
+                                     } 
                                    
                                 }
                             } 
-                        }
+                        }      
                     }
+                    console.log(fecha_log() + 'WS: ' + ws);
                     //control_precios(req,200); //19/09/24 anulamos el control de precios. el error lo generaba la replica nueva
                     return res.status(200).send({
                         status: "200", ws, registros, respuesta
@@ -898,7 +892,7 @@ reset_password: async function (req, res) {
                 }
             } catch (err) {
                 //control_precios(req,500); //19/09/24 anulamos el control de precios. el error lo generaba la replica nueva
-                console.error(fecha_log() + ' SQL error', err);
+                console.error(fecha_log() + ' ERROR: ${ws}' , err);
                 return res.status(500).send({
                     status: "500", ws, error: "Error interno en la peticion.",errorString
                 });
@@ -911,8 +905,7 @@ reset_password: async function (req, res) {
             });
         }
     }, 
-    
-     
+         
     descargas_docs: async function (req, res) {
         //console.log(fecha_log() +  "ws_descargas");
 
@@ -920,7 +913,7 @@ reset_password: async function (req, res) {
             //console.log(fecha_log() +  "BODY: "+JSON.stringify(req.body));
             JSON.stringify(req.body);
         } catch (err) {
-            console.error(fecha_log() + ' SQL error', err);
+            console.error(fecha_log() + ' JSON ', err);
             return res.status(500).send({
                 status: "500", err, error: "Error de Josep"
             });
@@ -929,7 +922,7 @@ reset_password: async function (req, res) {
         var paramsBody = req.body;
   
         try {
-        var request_log = pool2.request(); // o: new sql.Request(pool2) enlazamos con la bbdd real para insertar el log
+        var request_log = poolWeb.request(); // o: new sql.Request(pool2) enlazamos con la bbdd real para insertar el log
         var ws = paramsBody.ws;
         var xempresa_id = paramsBody.xempresa_id;
         var max_registros = paramsBody.max_registros;
@@ -951,22 +944,25 @@ reset_password: async function (req, res) {
         });
 
     }
-        
+        var consultaSqlWS='';
+        var controlTdsSds=0;
         try{
         if (ws.toLowerCase() == "descarga-fichero-coa"){
             var sql_inserta = "INSERT INTO yy_www_descargas_log (xempresa_id, xfecha, xlote_id, xarticulo_id, xemail, xnombre, xapellido, xtienda_id,xws) ";
             sql_inserta += "VALUES ('SCHB', GETDATE(),'" + xlote_id + "', '" +xarticulo_id + "', '" +xemail+"', '" +xnombre+"', '" +xapellido+"','" + xempresa_id + "','"+paramsBody.ws+"');"
         }else if (ws.toLowerCase() == "descarga-fichero-sds"){
+            controlTdsSds=1;
             var sql_inserta = "INSERT INTO yy_www_descargas_log (xempresa_id, xfecha, xidioma, xarticulo_id, xemail, xnombre, xapellido, xtienda_id,xws) ";
             sql_inserta += "VALUES ('SCHB', GETDATE(),'" + xidioma + "', '" +xarticulo_id + "', '" +xemail+"', '" +xnombre+"', '" +xapellido+"','" + xempresa_id + "','"+paramsBody.ws+"');"
         }else if (ws.toLowerCase() == "descarga-fichero-tds"){
+            controlTdsSds=1;
             var sql_inserta = "INSERT INTO yy_www_descargas_log (xempresa_id, xfecha, xidioma, xarticulo_id, xemail, xnombre, xapellido, xtienda_id,xws) ";
             sql_inserta += "VALUES ('SCHB', GETDATE(),'" + xidioma + "', '" +xarticulo_id + "', '" +xemail+"', '" +xnombre+"', '" +paramsBody.xapellido+"','" + xempresa_id + "','"+paramsBody.ws+"');"
         }    
         var resultado_insert = await  request_log.query(sql_inserta).catch("error catch");
         
         } catch (err) {
-            console.error(fecha_log() + ' SQL error', err);
+            console.error(fecha_log() + ' INSERT error', err);
             return res.status(500).send({
                 status: "500", err, error: "Error de Josep"
             });
@@ -976,9 +972,12 @@ reset_password: async function (req, res) {
         if (ws != null && xempresa_id != null) {
             var errorString ='';
             try {
-                ///aqui david
-                const consultaSqlWS = "SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in FROM yy_ws_intranet WHERE xempresa_id = '" + xempresa_id + "' AND xquery = '" + ws + "';";
-                
+                //14/10/2024. para poder mostrar todos los registros del articulo controlamos el idioma, si viene vacio, seleccionamos la consulta con -todos creada en BBDD.
+                if ((controlTdsSds == 1) && (xidioma == '')){
+                    consultaSqlWS = "SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in FROM yy_ws_intranet WHERE xempresa_id = '" + xempresa_id + "' AND xquery = '" + ws + "-todos';";
+                }else{
+                    consultaSqlWS = "SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in FROM yy_ws_intranet WHERE xempresa_id = '" + xempresa_id + "' AND xquery = '" + ws + "';";
+                 }
                 const resultadoConsultaSql = await request.query(consultaSqlWS);
                 //console.log(fecha_log() +  "TOTAL DE FILAS: " + resultadoConsultaSql.recordsets[0].length);
                 if (resultadoConsultaSql.recordsets[0].length == 0) {
@@ -997,7 +996,6 @@ reset_password: async function (req, res) {
                  var camposTipoInSplit = camposTipoIn != null ? camposTipoIn.split(",") : '';
                  //parametros de url en json
                  const jsonParametrosBody = JSON.parse(JSON.stringify(paramsBody));
-
                  //comprobar que estan esos parametros en url
                  const mapaParametros = new Map();
                  for (var param in parametrosResultadoSplit) {	
@@ -1008,7 +1006,7 @@ reset_password: async function (req, res) {
                             for(var i=0; i<jsonParametrosBody[parametrosResultadoSplit[param]].length; i++){	
                                 d+="'"+jsonParametrosBody[parametrosResultadoSplit[param]][i]+"',";	
                             }	
-                            console.log(fecha_log() +  d);	
+                            //console.log(fecha_log() +  d);	
                             d = d.substring(0, d.length -1);	
                             d += ")";	
                             var sustituto = d;	
@@ -1026,31 +1024,6 @@ reset_password: async function (req, res) {
                     }	
                 }	
 
-                 //console.log(fecha_log() +  'SELECT: '+selectResultado);
-                if (wsEkon == '-1') {
-                    console.log(fecha_log() +  paramsBody);
-                    //llamada aun WS de Ekon donde le enviamos parametros y el mismo responde
-                    var config = {
-                        method: 'POST',
-                        url: selectResultado,
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Basic REJBV0VCOkRiYXdlYjEx'
-                        },
-                        data: paramsBody
-                    };
-                    let axiosresp = await axios(config);
-            
-                    let respuesta = [];
-                    respuesta.push(axiosresp.data);//JSON.stringify(respuesta.data);
-                    console.log(fecha_log() +  respuesta);
-                    return res.status(200).send({
-                        status: "200",
-                        ws,
-                        respuesta
-                    });
-                } else {
-
                     //sustituimos el maximos de registros si lo hay
                     var registros = 0;
                     if(max_registros != null && max_registros != ''){
@@ -1067,7 +1040,7 @@ reset_password: async function (req, res) {
                     //console.log(fecha_log() +  "SELECT OK: "+selectResultado);
                     //ejecutamos la select devuelta de la tabla de consultas
                     const resultadoSelectPedida = await request.query(selectResultado);
-                  
+                  //console.log ("SQL: " + selectResultado);
                     var respuesta = resultadoSelectPedida.recordsets[0];
                     registros = respuesta.length;
                     if(camposObjeto != null && camposObjeto != ''){
@@ -1076,11 +1049,8 @@ reset_password: async function (req, res) {
                         for(var i=0; i<respuesta.length; i++){
                             for (var r in respuesta[i]) {
                                 if(camposObjetoSplit.includes(r)){
-                                    var pattern = /[\t]+/g;
-                                    errorString = respuesta[i] +' >>>>><<<<< '+ respuesta[i][r];
-                                    //console.log(fecha_log() +  'ANTES: '+errorString);
-                                    respuesta[i][r] = JSON.parse(respuesta[i][r].replaceAll('\n', ' ').replaceAll('\t','').replaceAll('\\','').replaceAll('\\\\','').replaceAll('\r', ' '));
-                                    //console.log(fecha_log() +  'DESPUES: '+respuesta[i][r]);
+                                    //respuesta[i][r] = JSON.parse(respuesta[i][r].replaceAll('\n', ' ').replaceAll('\t','').replaceAll('\\','').replaceAll('\\\\','').replaceAll('\r', ' '));
+                                    respuesta[i][r] = JSON.parse(respuesta[i][r]);
                                    
                                 }
                             } 
@@ -1090,9 +1060,9 @@ reset_password: async function (req, res) {
                     return res.status(200).send({
                         status: "200", ws, registros, respuesta
                     });
-                }
+                
             } catch (err) {
-                console.error(fecha_log() + ' SQL error', err);
+                console.error(fecha_log() + ' DescargaDocs ' + ws, err);
                 errorString = err ;
                 return res.status(500).send({   
                     status: "500", ws, error: "Error interno en la peticion.",errorString
@@ -1105,27 +1075,22 @@ reset_password: async function (req, res) {
             });
         }
     },
-    
-    
-    
     consulta_articulos_prueba: async function (req, res) {
         console.log(fecha_log() +  "consulta_articulos_prueba");
         try{
             console.log(fecha_log() +  "BODY: "+JSON.stringify(req.body));
         } catch (err) {
-            console.error(fecha_log() + ' SQL error', err);
+            console.error(fecha_log() + ' Error', err);
             return res.status(500).send({
                 status: "500", ws, error: "Error de Josep"
             });
         }
         var paramsHeader = req.headers;
         var paramsBody = req.body;
-        
-       
+           
         const ws = paramsBody.ws;
         const xempresa_id = paramsBody.xempresa_id;
         const max_registros = paramsBody.max_registros;
-
         //buscamos la select en la tabla de parametros
         if (ws != null && xempresa_id != null) {
             var errorString ='';
@@ -1181,9 +1146,6 @@ reset_password: async function (req, res) {
                     }
                 }
 
-                
-
-
                  console.log(fecha_log() +  'SELECT: '+selectResultado);
                 if (wsEkon == '-1') {
                     console.log(fecha_log() +  paramsBody);
@@ -1208,7 +1170,6 @@ reset_password: async function (req, res) {
                         respuesta
                     });
                 } else {
-
                     //sustituimos el maximos de registros si lo hay
                     var registros = 0;
                     if(max_registros != null && max_registros != ''){
@@ -1263,7 +1224,7 @@ reset_password: async function (req, res) {
                     });
                 }
             } catch (err) {
-                console.error(fecha_log() + ' SQL error', err);
+                console.error(fecha_log() + ' Prueba error', err);
                 return res.status(500).send({
                     status: "500", ws, error: "Error interno en la peticion.",errorString
                 });
@@ -1274,8 +1235,6 @@ reset_password: async function (req, res) {
                 status: "400", ws, error: "Faltan parametros.",
             });
         }
-
-
     },
     ws_descarga_fras: async function (req, res) {
         const pdfsDirectory = path.join(__dirname, 'pdfs');
@@ -1325,28 +1284,6 @@ reset_password: async function (req, res) {
             for (var i = 0; i < params.articulos.length; i++) {
                     await request.query("INSERT INTO "+tablaTemporalRegistros+" VALUES ('"+params.xempresa_id+"','"+params.articulos[i]+"')");
                 }
-
-
-                /*
-                var values = []; 
-                for (var i = 0; i < params.articulos.length; i++) {
-                    var value = [];
-                    value.push(params.xempresa_id, params.articulos[i]);
-                    values.push(value);
-                } */
-
-            /*request.query("INSERT INTO yyact_artics_temporal_intranet (xempresa_id, xarticulo_id) VALUES ", [values], function(err, result, fields){
-                if (err) throw err;
-                    //if no error, resulst return as follow
-                    console.log(fecha_log() +  result);
-                    console.log(fecha_log() +  "Number of rows affected :" + result.affectedRows);
-                    console.log(fecha_log() +  "Number of records affected with warning : " + result.warningCount);
-                    console.log(fecha_log() +  "Message from MySQL Server : " + result.message);
-                });*/
-                /*var insert = "INSERT INTO yyact_artics_temporal_intranet (xempresa_id, xarticulo_id) VALUES ";
-                console.log(fecha_log() +  values);
-                request.query(insert, [[values]]);*/
-
 
                 const resultadoSelectPedida = await request.query("SELECT * FROM "+tablaTemporalRegistros);
                 console.log(fecha_log() +  resultadoSelectPedida);
@@ -1414,8 +1351,6 @@ reset_password: async function (req, res) {
                 status: "500", ws: "guardar-nombre-fichero-coa", error: "Error interno en la peticion.",
             });
         }  
-        
-
     },
 
     prueba_strings: async function (req, res) {
@@ -1437,7 +1372,7 @@ reset_password: async function (req, res) {
     } ,
 
     busqueda_web: async function (req, res) {
-        //David. 30_8_2024. añadimos un control horario para el pool1. Entre las 0 y las 6 el sistema accederá a Claranet.
+        //David. 30_8_2024. añadimos un control horario para el pool1. Entre las 0 y las 2 el sistema accederá a Claranet.
         //OJO Pool 2 es BBDD Real para grabar resultados. lo ha de hacer en PROD.
         hora = new Date().getHours();
         var request = pool1.request(); // o: new sql.Request(pool1)
@@ -1446,17 +1381,25 @@ reset_password: async function (req, res) {
         }
         var paramsHeader = req.headers;
         var paramsBody = req.body;
-
+        var xtipo = 1;
+        if (paramsBody.xtipo == null){
+            xtipo = 1;
+        }else{
+             xtipo = paramsBody.xtipo;
+        }
+        console.log ("xtipo: " + xtipo);
         const ws = paramsBody.ws;
         const xempresa_id = paramsBody.xempresa_id;
         const max_registros = paramsBody.max_registros;
         var xbusqueda = paramsBody.xbusqueda;
         const xbusqueda_original = paramsBody.xbusqueda;
         const xcliente_id = paramsBody.xcliente_id;
-        xbusqueda=xbusqueda.replaceAll('\n', ' ').replaceAll('\t','').replaceAll('\\','').replaceAll('\\\\','').replaceAll('\r', ' ').replaceAll('\%','').replaceAll('\'','').replaceAll(', ',' ').replaceAll(',',' ').replaceAll('\"',' ');
+       // console.log ("xbusqueda: " + xbusqueda);
+        try{
+        xbusqueda = xbusqueda.replaceAll('\n', ' ').replaceAll('\t','').replaceAll('\\','').replaceAll('\\\\','').replaceAll('\r', ' ').replaceAll('\%','').replaceAll('\'','').replaceAll(', ',' ').replaceAll(',',' ').replaceAll('\"',' ');
                 //Insertamos la busqueda del usuario
                 try{
-                    const request_log = pool2.request(); // o: new sql.Request(pool2) enlazamos con la bbdd real para insertar el log
+                    const request_log = poolWeb.request(); // o: new sql.Request(pool2) enlazamos con la bbdd real para insertar el log
                     var sql_inserta = "INSERT INTO yy_www_busquedas_log (xempresa_id, xfecha, xbusqueda) ";
                     sql_inserta += "VALUES ('" + xempresa_id + "', GETDATE(),'" + xbusqueda.substring(0,254) + "')";
                     var resultado_insert = request_log.query(sql_inserta);
@@ -1466,21 +1409,33 @@ reset_password: async function (req, res) {
                         //status: "500", ws, error: "Error interno en la peticion.",errorString
                     //});
                 }
+            } catch (err) {
+                console.error(fecha_log() + ' Error: ', err);
+                return res.status(400).send({
+                    status: "400", ws, error: "Faltan parametros"
+                });
+            }
 
         //buscamos la select en la tabla de parametros
         if (ws != null && xempresa_id != null) {
             var errorString ='';
+            var consultaSqlWS = '';
             try {
-                const consultaSqlWS = "SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto FROM yy_ws_intranet WHERE xempresa_id = '" + xempresa_id + "' AND xquery = '" + ws + "';";
-                
+                if (xtipo==1){
+                consultaSqlWS = "SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto,xcontador FROM yy_ws_intranet WHERE xempresa_id = '" + xempresa_id + "' AND xquery = '" + ws + "';";
+                }else{
+                    //guaramos las consultas como ws en EKon añadiendole el tipo tras un guion con el tipo
+                consultaSqlWS = "SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto,xcontador FROM yy_ws_intranet WHERE xempresa_id = '" + xempresa_id + "' AND xquery = '" + ws + "-"+ xtipo +"';"; 
+                }
                 const resultadoConsultaSql = await request.query(consultaSqlWS);
-                //console.log(fecha_log() +  "TOTAL DE FILAS: " + resultadoConsultaSql.recordsets[0].length);
+                //console.log(fecha_log() +  "SQL: " + consultaSqlWS);
                 if (resultadoConsultaSql.recordsets[0].length == 0) {
                     return res.status(400).send({
                         status: "400", ws, error: "Peticion incorrecta"
                     });
                 }
-
+                var necesitaContadorTotales = resultadoConsultaSql.recordsets[0][0].xcontador;
+                //controlamos si la consulta utiliza otra consulta contador para saber los totales de registros previos. Para Busquedas.
                 var selectResultado = resultadoConsultaSql.recordsets[0][0].xconsulta;
                 var parametrosResultado = resultadoConsultaSql.recordsets[0][0].xparametros;
                 var wsEkon = resultadoConsultaSql.recordsets[0][0].xws_ekon;
@@ -1489,10 +1444,10 @@ reset_password: async function (req, res) {
                 var parametrosResultadoSplit = parametrosResultado.split(",");
 
                  //parametros de url en json
-                 const jsonParametrosBody = JSON.parse(JSON.stringify(paramsBody));
+                const jsonParametrosBody = JSON.parse(JSON.stringify(paramsBody));
 
                  //comprobar que estan esos parametros en url
-                 const mapaParametros = new Map();
+                 //const mapaParametros = new Map();
                  for (var param in parametrosResultadoSplit) {
                      if (jsonParametrosBody[parametrosResultadoSplit[param]] != null) {
                          var sustituto = typeof jsonParametrosBody[parametrosResultadoSplit[param]] == 'number' ? jsonParametrosBody[parametrosResultadoSplit[param]] : "'"+jsonParametrosBody[parametrosResultadoSplit[param]]+"'";
@@ -1518,29 +1473,36 @@ reset_password: async function (req, res) {
                         selectResultado = await selectResultado.replaceAll("{max_registros}","SELECT ");
                     }
                     //Añadimos los campos de busqueda extra que se necesiten: cojemos el campo xbusqueda de la select y hacemos el split
-                    //var busquedaSplit = xbusqueda.trim().split(" ");
-                    var busquedaSplit = xbusqueda.replaceAll("-","").trim().split(" ");
-        //Aqui estamos//
-                    //console.log(fecha_log() +  busquedaSplit);
+                    //Condicionamos la nueva busqueda para que solo funcione en Scharlab.
+                    if (xempresa_id != 'SCHB' && xempresa_id != 'SCHX'){
+                        var busquedaSplit = xbusqueda.trim().split(" ");
+                    }else{
+                        if (xtipo == 1){
+                            var busquedaSplit = xbusqueda.replaceAll("-","").trim().split(" ");
+                        }else{
+                            var busquedaSplit = xbusqueda.trim().split(" ");  
+                        }
+                    }
                     var indexBuscar ="*";
+                    //controlamos la busqueda de la primera palabra.
                     var clausulaWhere = "";
+                    var contador_palabras = "";
+                    //contaremos las palabras para no buscar más de 5.
                     for(var i = 0; i<busquedaSplit.length; i++){
-                        if ((busquedaSplit[0].toUpperCase().length > 3)){
+                        if (xtipo == 1){
+                            if ((busquedaSplit[i].toUpperCase().length > 3)){
                                 if ((busquedaSplit[i].toUpperCase() != 'DE')&&(busquedaSplit[i].toUpperCase() != 'EN')&&(busquedaSplit[i].toUpperCase() != 'Y')&&(busquedaSplit[i].toUpperCase() != 'EL')&&(busquedaSplit[i].toUpperCase() != 'PARA')&&(busquedaSplit[i].toUpperCase() != 'POR')   ){
                                     if (indexBuscar == "*")  indexBuscar=busquedaSplit[i];
                                         if  (!busquedaSplit[i].includes("-") ){
                                             if (!busquedaSplit[i].includes(".") && !busquedaSplit[i].includes("/") ) {
-                                                //clausulaWhere += " AND CONTAINS (s.xbusqueda, '\""+busquedaSplit[i].toLowerCase()+"\"', language 3082) ";
                                                 clausulaWhere += " AND ( CONTAINS (s.xbusqueda, '\""+busquedaSplit[i].toLowerCase()+"*\"', language 3082) ";
                                             }else{
                                                 clausulaWhere += " AND ( CONTAINS (s.xbusqueda, '\""+busquedaSplit[i].toLowerCase()+"\"', language 3082) ";
                                         }
                                         if (xempresa_id=='SCHX' || xempresa_id=='SPHP'){
                                         if ( (busquedaSplit[i].toUpperCase().includes('PH')) && (busquedaSplit[i].toUpperCase().length > 2) ){
-                                                //clausulaWhere += " OR CONTAINS (s.xbusqueda, '"+busquedaSplit[i].toLowerCase().replaceAll("ph","f")+"', language 3082) ";
                                                 clausulaWhere += " OR CONTAINS (s.xbusqueda, '\""+busquedaSplit[i].toLowerCase().replaceAll("ph","f")+"*\"', language 3082) ";
                                         }else if (busquedaSplit[i].toUpperCase().includes('F') && (busquedaSplit[i].toUpperCase().length > 2) ){
-                                            //clausulaWhere += " OR CONTAINS (s.xbusqueda, '"+busquedaSplit[i].toLowerCase().replaceAll("f","ph")+"', language 3082) ";
                                             clausulaWhere += " OR CONTAINS (s.xbusqueda, '\""+busquedaSplit[i].toLowerCase().replaceAll("f","ph")+"*\"', language 3082) ";
                                             }  
                                         }
@@ -1549,26 +1511,49 @@ reset_password: async function (req, res) {
                                         }
                                         else if (busquedaSplit[i].includes("-")){
                                             clausulaWhere += " AND (s.xbusqueda LIKE '%"+busquedaSplit[i]+"%') ";
-                                         }
-                                    
-                            }
-                        }
-                        
-                    }   
+                                         }     
+                                    }
+                                }
+                        } else if (xtipo ==2) { //busqueda por Referencia
+                            clausulaWhere += " AND (s.xarticulo_id LIKE '"+busquedaSplit[i]+"%') ";
+                        } else if (xtipo ==3) { //busqueda por CAS
+                            clausulaWhere += " AND (s.n992_cas LIKE '"+busquedaSplit[i]+"%') ";
+                        } else if (xtipo ==4) { //busqueda por Cross ref
+                            clausulaWhere += " AND (s.xRef_cruzadas LIKE '%"+busquedaSplit[i]+"%') ";
+                        } else if (xtipo ==5) { //busqueda por Ref Proveedor
+                            clausulaWhere += " AND (s.xReferencia LIKE '"+busquedaSplit[i]+"%' OR s.xReferencia2 LIKE '"+busquedaSplit[i]+"%' ) ";
+                        } else if (xtipo ==6) { //busqueda por Marcas
+                            clausulaWhere += " AND (s.xMarca LIKE '%"+busquedaSplit[i]+"%') ";
+                         }
+                    }
                     if (clausulaWhere == "") {
                         return res.status(400).send({
                             status: "400", ws, error: "Faltan datos.",
                     })};
-                    selectResultado = await selectResultado.replaceAll("{xwhere}",clausulaWhere);
-                    // reemplazamos el primer campo de busqueda para poder ordenar la select.            
+                   
+                    //Control de registros para que no devuelva miles.
+                    if (necesitaContadorTotales == '-1'){
+                        //console.log ("ENTRAMOS EN CONTADOR CONTROL");
+                        var preguntamos = await contadorRegistros (clausulaWhere,xempresa_id,ws,request,jsonParametrosBody,parametrosResultadoSplit)
+                        if (preguntamos > limiteRegistrosBusqueda){
+                            return res.status(205).send({
+                                status: "205", ws, error: "Busqueda demasiado extensa. Introduzca más información. " + preguntamos + " Reg.",
+                            });
+                        };    
+                    };
+
+                    
+                    // reemplazamos el primer campo de busqueda para poder ordenar la select.    
+                    selectResultado = await selectResultado.replaceAll("{xwhere}",clausulaWhere);        
                     selectResultado = await selectResultado.replaceAll("{xindexbuscar}",indexBuscar);
                     console.log(fecha_log() +  "SELECT OK: "+selectResultado );
 
-                    //ejecutamos la select devuelta de la tabla de consultasx
+                    //ejecutamos la select devuelta de la tabla de consultas.
                     var resultadoSelectPedida = null;
                     resultadoSelectPedida = await request.query(selectResultado);
                     var respuesta = resultadoSelectPedida.recordsets[0];
                     registros = respuesta.length;
+                    
                     if(camposObjeto != null && camposObjeto != ''){
                         //leer campos objeto que hay en el campo "camposObbjeto"
                         var camposObjetoSplit = camposObjeto != null ? camposObjeto.split(",") : '';
@@ -1586,10 +1571,9 @@ reset_password: async function (req, res) {
                     return res.status(200).send({
                         status: "200", ws, registros, respuesta   
                     });
-                    
                 
             } catch (err) {
-                console.error(fecha_log() + ' SQL error', err);
+                console.error(fecha_log() + ' Busqueda Error', err);
                 return res.status(500).send({
                     status: "500", ws, error: "Error interno en la peticion.",errorString
                 });
@@ -1649,18 +1633,13 @@ reset_password: async function (req, res) {
              });
             
         } catch (err) {
-            console.error(fecha_log() + ' SQL error', err);
+            console.error(fecha_log() + ' Prueba error', err);
             return res.status(500).send({
                 status: "500", ws, error: "Error interno en la peticion.",errorString
             });
         }
 
     },
-
-
-
-
-
 
     descifrar_2: async function (req, res) {
         console.log(fecha_log() +  "descifrar_2");
@@ -1747,7 +1726,7 @@ reset_password: async function (req, res) {
             }
             //Si falla la peticion sql envio el error
         } catch (err) {
-            console.error(fecha_log() + ' SQL error', err);
+            console.error(fecha_log() + ' Descifrar error', err);
             return res.status(500).send({
                 status: "500",
                 ws: "PETICION LOGIN",
@@ -1786,7 +1765,7 @@ reset_password: async function (req, res) {
         var paramsHeader = req.headers;
         var paramsBody = req.body;
     
-        const request_log = pool2.request(); // o: new sql.Request(pool2) enlazamos con la bbdd real para insertar el log
+        const request_log = poolWeb.request(); // o: new sql.Request(pool2) enlazamos con la bbdd real para insertar el log
         var ws = paramsBody.ws;
         const xempresa_id = ref.isnull ? paramsBody.xempresa_id:"SCHB";
         const max_registros = paramsBody.max_registros;
@@ -1797,7 +1776,7 @@ reset_password: async function (req, res) {
         const xnombre = paramsBody.xnombre;
         const xapellido = paramsBody.xapellido;
         type = type.toLowerCase();
-        //console.log(fecha_log() +  "ws_descargas. type:" + type + " Ref: " + ref + " Batch/Lang: "+batch+" email:"+email+" Empresa: "+xempresa_id);
+        console.log(fecha_log() +  "ws_descargas. type:" + type + " Ref: " + ref + " Batch/Lang: "+batch+" email:"+email+" Empresa: "+xempresa_id);
         if( (ws == "descarga-fichero-coa") || (type=="coa") ){
             ws = "descarga-fichero-coa";
             var sql_inserta = "INSERT INTO yy_www_descargas_log (xempresa_id, xfecha, xlote_id, xarticulo_id, xemail, xnombre, xapellido, xtienda_id,xws) ";
@@ -1868,7 +1847,6 @@ reset_password: async function (req, res) {
                         selectResultado = await selectResultado.replaceAll("{" + parametrosResultadoSplit[2] + "}", sustituto);
                         //ejecutamos la select devuelta de la tabla de consultas
                         const resultadoSelectPedida = await request.query(selectResultado);
-
                         var respuesta = resultadoSelectPedida.recordsets[0];
                     }
                     //var respuesta = resultadoSelectPedida.recordsets[0];
@@ -1939,7 +1917,7 @@ ws_notificaciones_add: async function (req, res) {
         if (resultadoConsultaSql.recordsets[0].length == 0) {
                 //Si no existe hacemos un insert en pool2.
                  var sql_inserta = "INSERT INTO pl_artcliente (xempresa_id,xarticulo_id,xcliente_id,yycal_not_camb_web) ";
-                 sql_inserta += "VALUES ('" + xempresa_id + "','" +xarticulo_id + "', '" +xcliente_id+"',-1);"          
+                 sql_inserta += "VALUES ('" + xempresa_id + "','" + xarticulo_id + "', '" +xcliente_id+"',-1);"          
                  await requestadd.query(sql_inserta);
 
         }else {
@@ -1996,6 +1974,137 @@ ws_notificaciones_del: async function (req, res) {
             error: "Se ha producido un error descontrolado." 
         });
          }
+    }, ws_ia_consultas_post: async function (req, res) {
+        //David. 17_12_2024. Solicitudes para proyecrto IA.
+        console.log ("**********IA,Begining********** " + new Date().getTime());
+        var request = pool1.request(); // o: new sql.Request(pool1)
+        var paramsHeader = req.headers;
+        var paramsBody = req.body;
+        
+        const ws = paramsBody.ws;
+        const xempresa_id = paramsBody.xempresa_id;
+        const max_registros = paramsBody.max_registros;
+        //console.log ("WS:" + ws);
+        //buscamos la select en la tabla de parametros
+        if (ws != null && xempresa_id != null) {
+            var errorString ='';
+            try {
+                const consultaSqlWS = "SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = '" + xempresa_id + "' AND xquery = '" + ws + "';";
+                console.log ("SQL:" + consultaSqlWS );
+                const resultadoConsultaSql = await request.query(consultaSqlWS);
+                //console.log(fecha_log() +  "TOTAL DE FILAS: " + resultadoConsultaSql.recordsets[0].length);
+                if (resultadoConsultaSql.recordsets[0].length == 0) {
+                    return res.status(400).send({
+                        status: "400", ws, error: "Peticion incorrecta"
+                    });
+                }
+                var xcontador = resultadoConsultaSql.recordsets[0][0].xcontador;
+                var selectResultado = resultadoConsultaSql.recordsets[0][0].xconsulta;
+                var parametrosResultado = resultadoConsultaSql.recordsets[0][0].xparametros;
+                var wsEkon = resultadoConsultaSql.recordsets[0][0].xws_ekon;
+                var camposObjeto = resultadoConsultaSql.recordsets[0][0].xcampos_objeto;
+                var camposTipoIn = resultadoConsultaSql.recordsets[0][0].xcampos_tipo_in;
+                 //leer parametros que hay definidos en "parametrosResultado" y trocearlo segun la coma que los separa
+                 var parametrosResultadoSplit = parametrosResultado != null ? parametrosResultado.split(",") : null;
+                 var camposTipoInSplit = camposTipoIn != null ? camposTipoIn.split(",") : '';
+                 //parametros de url en json
+                 const jsonParametrosBody = JSON.parse(JSON.stringify(paramsBody));
+                 //comprobar que estan esos parametros en url
+                 const mapaParametros = new Map();
+                 var sustituto = "";	
+                 for (var param in parametrosResultadoSplit) {	
+                    if (jsonParametrosBody[parametrosResultadoSplit[param]] != null) {	
+                        //console.log(fecha_log() +  parametrosResultadoSplit[param] + ' --- ' + jsonParametrosBody[parametrosResultadoSplit[param]]);	
+                        if(camposTipoInSplit.includes(parametrosResultadoSplit[param])){	
+                            var d = "(";	
+                            for(var i=0; i<jsonParametrosBody[parametrosResultadoSplit[param]].length; i++){	
+                                d+="'"+jsonParametrosBody[parametrosResultadoSplit[param]][i]+"',";	
+                            }	
+                            console.log(fecha_log() +  d);	
+                            d = d.substring(0, d.length -1);	
+                            d += ")";	
+
+                            sustituto = d;	
+                            selectResultado = await selectResultado.replaceAll("{" + parametrosResultadoSplit[param] + "}", sustituto);	
+                        }else{	
+                            if (parametrosResultadoSplit[param] == 'xempresa_id'){
+                                //ponemos este IF para que solo busque por LIKE del segundo campo cuando xcontador = '-1'
+                                sustituto = typeof jsonParametrosBody[parametrosResultadoSplit[param]] == 'number' ? jsonParametrosBody[parametrosResultadoSplit[param]] : "'"+jsonParametrosBody[parametrosResultadoSplit[param]]+"'";	
+                            }else if (xcontador == -1){
+                                sustituto = jsonParametrosBody[parametrosResultadoSplit[param]];	
+                            }else{
+                                sustituto = typeof jsonParametrosBody[parametrosResultadoSplit[param]] == 'number' ? jsonParametrosBody[parametrosResultadoSplit[param]] : "'"+jsonParametrosBody[parametrosResultadoSplit[param]]+"'";	
+                            }
+                            selectResultado = await selectResultado.replaceAll("{" + parametrosResultadoSplit[param] + "}", sustituto);	
+                            
+                        }	
+                    } else {	
+                        //const parametrosResultadoSplit[param] = parametros.parametrosResultadoSplit[param];	
+                        //console.log(fecha_log() +  parametrosResultadoSplit[param]);	
+                        return res.status(400).send({	
+                            status: "400", ws, error: "Faltan parametros"	
+                        });	
+                    }	
+                }	
+                console.log(fecha_log() +  'SELECT: '+selectResultado);
+                    //sustituimos el maximos de registros si lo hay
+                    var registros = 0;
+                    if(max_registros != null && max_registros != ''){
+                        if(typeof max_registros == 'number'){
+                            selectResultado = await selectResultado.replaceAll("{max_registros}","SELECT TOP "+max_registros);
+                        }else{
+                            return res.status(400).send({
+                                status: "400", ws, error: "Registros máximos incorrectos"
+                            });
+                        }
+                    }else{
+                        selectResultado = await selectResultado.replaceAll("{max_registros}","SELECT ");
+                    }
+                    //console.log(fecha_log() +  "SELECT OK: " + selectResultado);
+                    //ejecutamos la select devuelta de la tabla de consultas
+                    const resultadoSelectPedida = await request.query(selectResultado);
+                  
+                    var respuesta = resultadoSelectPedida.recordsets[0];
+                    registros = respuesta.length;
+                    
+                    if(camposObjeto != null && camposObjeto != ''){
+                        //leer campos objeto que hay en el campo "camposObbjeto"
+                        var camposObjetoSplit = camposObjeto != null ? camposObjeto.split(",") : '';     
+                        for(var i=0; i<respuesta.length; i++){
+                            for (var r in respuesta[i]) {
+                                if(camposObjetoSplit.includes(r)){
+                                    if(respuesta[i][r] != null){
+                                        if (xcontador == '-1'){
+                                        respuesta[i][r] = JSON.parse(respuesta[i][r].replaceAll('\n', ' ').replaceAll('\\','').replaceAll('\t','').replaceAll('\\\\','').replaceAll('\r', ' '));
+                                        }else{
+                                        respuesta[i][r] = JSON.parse(respuesta[i][r].replaceAll('\n', ' ').replaceAll('\t',''))
+                                        }
+                                     } 
+                                   
+                                }
+                            } 
+                        }      
+                    }
+                    console.log(fecha_log() + 'WS: ' + ws);
+                    //control_precios(req,200); //19/09/24 anulamos el control de precios. el error lo generaba la replica nueva
+                    return res.status(200).send({
+                        status: "200", ws, registros, respuesta
+                    });
+                
+            } catch (err) {
+                //control_precios(req,500); //19/09/24 anulamos el control de precios. el error lo generaba la replica nueva
+                console.error(fecha_log() + ' ERROR: ${ws}' , err);
+                return res.status(500).send({
+                    status: "500", ws, error: "Error interno en la peticion.",errorString
+                });
+            }
+
+        } else {
+            //control_precios(req,400);
+            return res.status(400).send({
+                status: "400", ws, error: "Faltan parametros.",
+            });
+        }
     }
     
 };
@@ -2029,11 +2138,28 @@ function fecha_log(){
     return fecha;
 } 
 
-function contadorRegistros (xbusqueda){
-    var consultaSqlWS = "SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto FROM yy_ws_intranet WHERE xempresa_id = '" + xempresa_id + "' AND xquery = '" + ws + "';";
-                
-    var resultadoConsultaSql = request.query(consultaSqlWS);
-    return resultadoConsultaSql.recordsets[0].length;
+async function contadorRegistros (clausulaWhere_1,xempresa_id_1,ws_1,request_1,jsonParametrosBody,parametrosResultadoSplit){
+    try {
+    var consSqlWS = "SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto FROM yy_ws_intranet WHERE xempresa_id = '" + xempresa_id_1 + "' AND xquery = '" + ws_1 + "-contador';";            
+    var resConsultaSql = await request_1.query(consSqlWS);
+    //console.log (consSqlWS);
+    var selResultado = resConsultaSql.recordsets[0][0].xconsulta;
+    //Para la busqueda de cliente, necesitamos sustiur mas campos en la select de contador, como el xcliente_id
+    for (var param in parametrosResultadoSplit) {
+            var sustituto = typeof jsonParametrosBody[parametrosResultadoSplit[param]] == 'number' ? jsonParametrosBody[parametrosResultadoSplit[param]] : "'"+jsonParametrosBody[parametrosResultadoSplit[param]]+"'";
+            selResultado = await selResultado.replaceAll("{" + parametrosResultadoSplit[param] + "}", sustituto);
+    }
+
+    selResultado = selResultado.replaceAll("{xempresa_id}","'"+xempresa_id_1+"'");
+    selResultado = selResultado.replaceAll("{xwhere}",clausulaWhere_1);
+
+    resConsultaSql = await request_1.query(selResultado);
+    }catch (err){
+        console.log ("Error de Catch: " + err + " WS: " + selResultado);
+        return limiteRegistrosBusqueda+1;
+    }
+
+    return resConsultaSql.recordsets[0][0].cuantos;
 }
 
 module.exports = controller;

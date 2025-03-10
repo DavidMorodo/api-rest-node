@@ -137,16 +137,20 @@ module.exports = {
             const ejecutar_update = await request.query(query);
             return "Usuario Registrado Correctamente";
     },
-    update_user_datos_v2: async function (empresa, xcliente_id, xusuario, xrol, xperfil,xemail,xemail_responsable,xnombre,xapellidos,xemail_pedidos){ //Funcion que actualiza un email y nombre desde la web via Ws.
+    update_user_datos_v2: async function (empresa, xcliente_id, xusuario, xrol, xperfil,xemail,xemail_responsable,xnombre,xapellidos,xemail_pedidos,xemail_notificaciones){ //Funcion que actualiza un email y nombre desde la web via Ws.
         //Buscar usuario que coincida con el nombre de usuario
         await pool2Connect; // Me aseguro que la pool de conexiones esta creada
         //Actualizar Ususuario en la base de datos
         
             var request = pool2.request(); // o: new sql.Request(pool1)
-            console.log("UPDATE yy_ws_intranet_usu SET xrol='"+xrol+"',xperfil='"+xperfil+"',xnombre='"+xnombre+"',xapellidos='"+xapellidos+"' ,xemail='"+xemail+"' , xemail_responsable='"+xemail_responsable+"' ,xemail_pedidos='"+xemail_pedidos+"' WHERE xempresa_id = '"+empresa+"' AND xusuario = '"+xusuario+"' AND xcliente_id = '"+xcliente_id+"'");
-            //const query = "UPDATE yy_ws_intranet_usu SET xusuario='"+xusuario+"',xrol='"+xrol+"',xperfil='"+xperfil+"',xpassword='"+xpassword+"' WHERE xcliente_id='"+xcliente_id+"';";
             const query = "UPDATE yy_ws_intranet_usu SET xrol='"+xrol+"',xperfil='"+xperfil+"',xnombre='"+xnombre+"',xapellidos='"+xapellidos+"' ,xemail='"+xemail+"' , xemail_responsable='"+xemail_responsable+"' ,xemail_pedidos='"+xemail_pedidos+"',xactivo=-1 WHERE xempresa_id = '"+empresa+"' AND xusuario = '"+xusuario+"' AND xcliente_id = '"+xcliente_id+"'";
             const ejecutar_update = await request.query(query);
+            //David M.13/12/2024. hemos de modificar pl_clientes.yyemail_notcamb.
+            if (empresa == 'SCHX') empresa='SCHB';
+            const query2 = "UPDATE pl_clientes SET yyemail_notcamb='"+xemail_notificaciones+"' WHERE xempresa_id = '"+empresa+"' AND xcliente_id = '"+xcliente_id+"'";
+            //console.log (query2);
+            const ejecutar_update2 = await request.query(query2);
+
             return "Usuario Registrado Correctamente";
     },
     string_sql: async function (string){

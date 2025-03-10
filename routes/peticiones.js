@@ -2,8 +2,10 @@
 var express = require('express');
 var router = express.Router();
 var peticionesController=require('../controllers/peticiones');
+var peticionesPrecios=require('../controllers/CheckPrecios');
 var md_autenticado = require('../middlewares/autenticados');
-
+//test precios *hasta los webs de WS Ekon....*
+router.post('/precio',peticionesPrecios.test);
 //Rutas de test
 router.post('/status', md_autenticado.autenticado, peticionesController.probando);
 router.post('/add', peticionesController.add);
@@ -50,5 +52,7 @@ router.post('/lista_clientes',    peticionesController.listar_clientes_conNombre
 router.post('/listado_clientes',    peticionesController.listar_clientes_conNombre_usuarios);
 router.post('/listado_clientes_new',    peticionesController.listar_clientes_conNombre_usuarios);
 router.get('/usuario/:xusuario',  md_autenticado.autenticado, peticionesController.obtener_usuario);
+
+router.post('/WS-IA',peticionesController.ws_ia_consultas_post);
 
 module.exports = router;

@@ -10,10 +10,10 @@ module.exports ={
         pool: {
           max: 10,
           min: 0,
-          idleTimeoutMillis: 30000
+          idleTimeoutMillis: 600000
         },
         //timeout de consulta añadido por carlos. 5minutos
-        requestTimeout: 60000,
+        requestTimeout: 600000,
         options: {
           //encrypt: true, // para conexion de azure
           trustServerCertificate: true, // Cambiar a true para local dev / self-signed certs
@@ -49,7 +49,6 @@ module.exports ={
         password: 'ccsccs',
         database: 'N992_DATA_NEW',
         //conexion Claranet.
-       //server: '92.54.15.197',// eKON Claranet
        server: '92.54.15.197',// eKON Claranet
         pool: {
           max: 10,
@@ -65,6 +64,26 @@ module.exports ={
               minVersion: 'TLSv1'
           } 
         }
-      }
+      },    
 
+      sqlWeb : {
+        user: 'imp',
+        password: 'ccsccs',
+        database: 'WEB_DATOS', //Este esl de TEST BUENO. en replica no hay data_unit4
+        server: '172.26.110.116',//replica 
+        pool: {
+          max: 10,
+          min: 0,
+          idleTimeoutMillis: 600000
+        },
+        //timeout de consulta añadido por carlos. 5minutos
+        requestTimeout: 600000,
+        options: {
+          //encrypt: true, // para conexion de azure
+          trustServerCertificate: true, // Cambiar a true para local dev / self-signed certs
+          cryptoCredentialsDetails: {
+              minVersion: 'TLSv1'
+          } 
+        }
+      }
 };
