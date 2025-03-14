@@ -1394,9 +1394,9 @@ reset_password: async function (req, res) {
         var xbusqueda = paramsBody.xbusqueda;
         const xbusqueda_original = paramsBody.xbusqueda;
         const xcliente_id = paramsBody.xcliente_id;
-       // console.log ("xbusqueda: " + xbusqueda);
+        
         try{
-        xbusqueda = xbusqueda.replaceAll('\n', ' ').replaceAll('\t','').replaceAll('\\','').replaceAll('\\\\','').replaceAll('\r', ' ').replaceAll('\%','').replaceAll('\'','').replaceAll(', ',' ').replaceAll(',',' ').replaceAll('\"',' ');
+        xbusqueda = xbusqueda.replaceAll('\n', ' ').replaceAll('\t','').replaceAll('\\','').replaceAll('\\\\','').replaceAll('\r', ' ').replaceAll('\%','').replaceAll('\'','').replaceAll(', ',' ').replaceAll(',',' ').replaceAll('\"',' ').replaceAll('.','');
                 //Insertamos la busqueda del usuario
                 try{
                     const request_log = poolWeb.request(); // o: new sql.Request(pool2) enlazamos con la bbdd real para insertar el log

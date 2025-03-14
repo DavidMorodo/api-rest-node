@@ -154,3 +154,8 @@
 2025-03-06 09:40:36 - Finished nodeserver__1.exe
 2025-03-06 09:40:38 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
 2025-03-06 09:40:38 - Started 22876
+2025-03-12 13:43:20 - Stopping nodeserver__1.exe
+2025-03-12 13:43:20 - ProcessKill 22876
+2025-03-12 13:43:20 - Finished nodeserver__1.exe
+2025-03-14 16:52:28 - Starting node.exe --harmony "C:\webservice\api-rest-node\node_modules\node-windows\lib\wrapper.js" -f "C:\webservice\api-rest-node\index.js" -l "nodeServer__1" -g 0.25 -w 1 -r 3 -a n
+2025-03-14 16:52:28 - Started 25252

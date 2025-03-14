@@ -37563,3 +37563,868 @@ SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto
 2025-3-10//7:20:44xarticulo_id --- CP04807-56
 2025-3-10//7:20:44xcantidad --- 1
 2025-3-10//7:20:44SELECT: http://172.26.110.207:5580/api/PRUEBAS_EKON/YYWS_SalesPrices/obtener-precios-venta-intranet
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'target-distribuidor';
+2025-3-10//12:11:23xempresa_id --- SCHB
+2025-3-10//12:11:23xcliente_id --- 11392
+2025-3-10//12:11:23xciclo_id --- 2025
+2025-3-10//12:11:23SELECT: SELECT t.xciclo_id,t.xtarget, (SELECT ROUND(SUM(l.ximporte_db),0) as Ventas 
+FROM pl_fracli_cab c  
+INNER JOIN pl_fracli_lin l ON l.xempresa_id=c.xempresa_id AND l.xseccion_id=c.xseccion_id AND l.xciclo_id=c.xciclo_id AND l.xtipodoc_id=c.xtipodoc_id AND l.xnumdoc_id=c.xnumdoc_id  AND l.xarticulo_id IS NOT NULL 
+WHERE c.xempresa_id = conv.xempresa_id AND c.xcontabilizado='-1' AND c.xciclo_id=t.xciclo_id AND c.xcliente_id=t.xcliente_id ) as Sales, ROUND (((t.xtarget/12)*(MONTH(GETDATE())-1)),0) AS Expected 
+FROM n992_cli_target t  
+INNER JOIN yy_ws_emp_conv conv ON t.xempresa_id = conv.xempresa_id  
+WHERE conv.xempresa_conv_id = 'SCHB' AND t.xciclo_id='2025' AND t.xcliente_id='11392';
+2025-3-10//12:11:24WS: target-distribuidor
+xtipo: 1
+2025-3-10//12:11:35SELECT OK: SELECT DISTINCT TOP 500 dato.xarticulo_id,
+isnull(ex.xdisponible,0) AS xdisponible,
+CASE WHEN (ISNULL(m.xgrupo,'999')>0) THEN 1 ELSE  m.xgrupo END AS xorden,
+xindexbuscar 
+FROM (
+SELECT conv.xempresa_id as xempresa_id, s.xarticulo_id, CHARINDEX('TLTN31003',s.xbusqueda) as xindexbuscar FROM n992_wc_superquery as s 
+INNER JOIN yy_ws_emp_conv conv WITH (NOLOCK) ON s.xempresa_id = conv.xempresa_id 
+WHERE conv.xempresa_conv_id='SCHB'  
+ AND ( CONTAINS (s.xbusqueda, '"tltn31003*"', language 3082)  )  
+UNION
+SELECT conv.xempresa_id as xempresa_id, alt.xref_alternativa AS xarticulo_id, CHARINDEX('TLTN31003',s.xbusqueda)+1 as xindexbuscar FROM n992_wc_superquery as s 
+INNER JOIN yy_ws_emp_conv conv WITH (NOLOCK) ON s.xempresa_id = conv.xempresa_id 
+INNER JOIN yy_ref_alterna_art alt WITH (NOLOCK) ON alt.xempresa_id=s.xempresa_id AND alt.xarticulo_id=s.xarticulo_id
+WHERE conv.xempresa_conv_id='SCHB'  
+ AND ( CONTAINS (s.xbusqueda, '"tltn31003*"', language 3082)  )  
+) as dato 
+INNER JOIN pl_articulos a WITH (NOLOCK) ON dato.xempresa_id = a.xempresa_id AND dato.xarticulo_id = a.xarticulo_id AND a.n992_baja != '-1' AND a.n992_descat != '-1' 
+INNER JOIN pl_familias f WITH (NOLOCK) ON f.xempresa_id=a.xempresa_id AND f.xfamilia_id=a.xfamilia_id  AND ISNULL(f.n992_linea,'00')<>'11' 
+INNER JOIN n992_marcasart m WITH (NOLOCK) ON m.xempresa_id=a.xempresa_id AND m.xmarca_id=a.n992_marca 
+LEFT OUTER JOIN yy_ws_existencias ex WITH (NOLOCK) ON ex.xempresa_id=a.xempresa_id AND ex.xarticulo_id=a.xarticulo_id 
+LEFT OUTER JOIN imp.yy_ws_art_cli_ano cli ON cli.XEMPRESA_ID=a.xempresa_id AND cli.XCLIENTE_ID= '11392' AND cli.XARTICULO_ID=a.xarticulo_id 
+LEFT OUTER JOIN imp.pl_cli_preart pesp ON pesp.xempresa_id=a.xempresa_id AND pesp.xcliente_id='11392' AND pesp.xarticulo_id=a.xarticulo_id 
+WHERE ( (a.n992_intranet='-1')  OR (ISNULL(pesp.xprecio,0)<>0) )
+ORDER BY xorden, xindexbuscar, xdisponible DESC, xarticulo_id;
+xtipo: 1
+2025-3-10//12:11:54SELECT OK: SELECT DISTINCT TOP 500 dato.xarticulo_id,
+isnull(ex.xdisponible,0) AS xdisponible,
+CASE WHEN (ISNULL(m.xgrupo,'999')>0) THEN 1 ELSE  m.xgrupo END AS xorden,
+xindexbuscar 
+FROM (
+SELECT conv.xempresa_id as xempresa_id, s.xarticulo_id, CHARINDEX('ac03231000',s.xbusqueda) as xindexbuscar FROM n992_wc_superquery as s 
+INNER JOIN yy_ws_emp_conv conv WITH (NOLOCK) ON s.xempresa_id = conv.xempresa_id 
+WHERE conv.xempresa_conv_id='SCHB'  
+ AND ( CONTAINS (s.xbusqueda, '"ac03231000*"', language 3082)  )  
+UNION
+SELECT conv.xempresa_id as xempresa_id, alt.xref_alternativa AS xarticulo_id, CHARINDEX('ac03231000',s.xbusqueda)+1 as xindexbuscar FROM n992_wc_superquery as s 
+INNER JOIN yy_ws_emp_conv conv WITH (NOLOCK) ON s.xempresa_id = conv.xempresa_id 
+INNER JOIN yy_ref_alterna_art alt WITH (NOLOCK) ON alt.xempresa_id=s.xempresa_id AND alt.xarticulo_id=s.xarticulo_id
+WHERE conv.xempresa_conv_id='SCHB'  
+ AND ( CONTAINS (s.xbusqueda, '"ac03231000*"', language 3082)  )  
+) as dato 
+INNER JOIN pl_articulos a WITH (NOLOCK) ON dato.xempresa_id = a.xempresa_id AND dato.xarticulo_id = a.xarticulo_id AND a.n992_baja != '-1' AND a.n992_descat != '-1' 
+INNER JOIN pl_familias f WITH (NOLOCK) ON f.xempresa_id=a.xempresa_id AND f.xfamilia_id=a.xfamilia_id  AND ISNULL(f.n992_linea,'00')<>'11' 
+INNER JOIN n992_marcasart m WITH (NOLOCK) ON m.xempresa_id=a.xempresa_id AND m.xmarca_id=a.n992_marca 
+LEFT OUTER JOIN yy_ws_existencias ex WITH (NOLOCK) ON ex.xempresa_id=a.xempresa_id AND ex.xarticulo_id=a.xarticulo_id 
+LEFT OUTER JOIN imp.yy_ws_art_cli_ano cli ON cli.XEMPRESA_ID=a.xempresa_id AND cli.XCLIENTE_ID= '11392' AND cli.XARTICULO_ID=a.xarticulo_id 
+LEFT OUTER JOIN imp.pl_cli_preart pesp ON pesp.xempresa_id=a.xempresa_id AND pesp.xcliente_id='11392' AND pesp.xarticulo_id=a.xarticulo_id 
+WHERE ( (a.n992_intranet='-1')  OR (ISNULL(pesp.xprecio,0)<>0) )
+ORDER BY xorden, xindexbuscar, xdisponible DESC, xarticulo_id;
+xtipo: 1
+2025-3-10//12:12:0SELECT OK: SELECT DISTINCT TOP 500 dato.xarticulo_id,
+isnull(ex.xdisponible,0) AS xdisponible,
+CASE WHEN (ISNULL(m.xgrupo,'999')>0) THEN 1 ELSE  m.xgrupo END AS xorden,
+xindexbuscar 
+FROM (
+SELECT conv.xempresa_id as xempresa_id, s.xarticulo_id, CHARINDEX('ac0323',s.xbusqueda) as xindexbuscar FROM n992_wc_superquery as s 
+INNER JOIN yy_ws_emp_conv conv WITH (NOLOCK) ON s.xempresa_id = conv.xempresa_id 
+WHERE conv.xempresa_conv_id='SCHB'  
+ AND ( CONTAINS (s.xbusqueda, '"ac0323*"', language 3082)  )  
+UNION
+SELECT conv.xempresa_id as xempresa_id, alt.xref_alternativa AS xarticulo_id, CHARINDEX('ac0323',s.xbusqueda)+1 as xindexbuscar FROM n992_wc_superquery as s 
+INNER JOIN yy_ws_emp_conv conv WITH (NOLOCK) ON s.xempresa_id = conv.xempresa_id 
+INNER JOIN yy_ref_alterna_art alt WITH (NOLOCK) ON alt.xempresa_id=s.xempresa_id AND alt.xarticulo_id=s.xarticulo_id
+WHERE conv.xempresa_conv_id='SCHB'  
+ AND ( CONTAINS (s.xbusqueda, '"ac0323*"', language 3082)  )  
+) as dato 
+INNER JOIN pl_articulos a WITH (NOLOCK) ON dato.xempresa_id = a.xempresa_id AND dato.xarticulo_id = a.xarticulo_id AND a.n992_baja != '-1' AND a.n992_descat != '-1' 
+INNER JOIN pl_familias f WITH (NOLOCK) ON f.xempresa_id=a.xempresa_id AND f.xfamilia_id=a.xfamilia_id  AND ISNULL(f.n992_linea,'00')<>'11' 
+INNER JOIN n992_marcasart m WITH (NOLOCK) ON m.xempresa_id=a.xempresa_id AND m.xmarca_id=a.n992_marca 
+LEFT OUTER JOIN yy_ws_existencias ex WITH (NOLOCK) ON ex.xempresa_id=a.xempresa_id AND ex.xarticulo_id=a.xarticulo_id 
+LEFT OUTER JOIN imp.yy_ws_art_cli_ano cli ON cli.XEMPRESA_ID=a.xempresa_id AND cli.XCLIENTE_ID= '11392' AND cli.XARTICULO_ID=a.xarticulo_id 
+LEFT OUTER JOIN imp.pl_cli_preart pesp ON pesp.xempresa_id=a.xempresa_id AND pesp.xcliente_id='11392' AND pesp.xarticulo_id=a.xarticulo_id 
+WHERE ( (a.n992_intranet='-1')  OR (ISNULL(pesp.xprecio,0)<>0) )
+ORDER BY xorden, xindexbuscar, xdisponible DESC, xarticulo_id;
+xtipo: 1
+2025-3-10//12:12:3SELECT OK: SELECT DISTINCT TOP 500 dato.xarticulo_id,
+isnull(ex.xdisponible,0) AS xdisponible,
+CASE WHEN (ISNULL(m.xgrupo,'999')>0) THEN 1 ELSE  m.xgrupo END AS xorden,
+xindexbuscar 
+FROM (
+SELECT conv.xempresa_id as xempresa_id, s.xarticulo_id, CHARINDEX('ac032',s.xbusqueda) as xindexbuscar FROM n992_wc_superquery as s 
+INNER JOIN yy_ws_emp_conv conv WITH (NOLOCK) ON s.xempresa_id = conv.xempresa_id 
+WHERE conv.xempresa_conv_id='SCHB'  
+ AND ( CONTAINS (s.xbusqueda, '"ac032*"', language 3082)  )  
+UNION
+SELECT conv.xempresa_id as xempresa_id, alt.xref_alternativa AS xarticulo_id, CHARINDEX('ac032',s.xbusqueda)+1 as xindexbuscar FROM n992_wc_superquery as s 
+INNER JOIN yy_ws_emp_conv conv WITH (NOLOCK) ON s.xempresa_id = conv.xempresa_id 
+INNER JOIN yy_ref_alterna_art alt WITH (NOLOCK) ON alt.xempresa_id=s.xempresa_id AND alt.xarticulo_id=s.xarticulo_id
+WHERE conv.xempresa_conv_id='SCHB'  
+ AND ( CONTAINS (s.xbusqueda, '"ac032*"', language 3082)  )  
+) as dato 
+INNER JOIN pl_articulos a WITH (NOLOCK) ON dato.xempresa_id = a.xempresa_id AND dato.xarticulo_id = a.xarticulo_id AND a.n992_baja != '-1' AND a.n992_descat != '-1' 
+INNER JOIN pl_familias f WITH (NOLOCK) ON f.xempresa_id=a.xempresa_id AND f.xfamilia_id=a.xfamilia_id  AND ISNULL(f.n992_linea,'00')<>'11' 
+INNER JOIN n992_marcasart m WITH (NOLOCK) ON m.xempresa_id=a.xempresa_id AND m.xmarca_id=a.n992_marca 
+LEFT OUTER JOIN yy_ws_existencias ex WITH (NOLOCK) ON ex.xempresa_id=a.xempresa_id AND ex.xarticulo_id=a.xarticulo_id 
+LEFT OUTER JOIN imp.yy_ws_art_cli_ano cli ON cli.XEMPRESA_ID=a.xempresa_id AND cli.XCLIENTE_ID= '11392' AND cli.XARTICULO_ID=a.xarticulo_id 
+LEFT OUTER JOIN imp.pl_cli_preart pesp ON pesp.xempresa_id=a.xempresa_id AND pesp.xcliente_id='11392' AND pesp.xarticulo_id=a.xarticulo_id 
+WHERE ( (a.n992_intranet='-1')  OR (ISNULL(pesp.xprecio,0)<>0) )
+ORDER BY xorden, xindexbuscar, xdisponible DESC, xarticulo_id;
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'existencias-art';
+2025-3-10//12:12:6xempresa_id --- SCHB
+2025-3-10//12:12:6xarticulo_id --- AC03292500
+2025-3-10//12:12:6SELECT: SELECT xempresa_id,xarticulo_id, SUM(xdisponible) AS xdisponible, SUM(xoutlet_disponible) AS xdisponible_outlet 
+FROM (
+SELECT DISTINCT  conv.xempresa_conv_id as xempresa_id,pl_existalm.xarticulo_id,
+ISNULL(outlet.xexist_out,0) AS xoutlet_disponible,
+(isnull(pl_existalm.xexistencia,0)-isnull(pl_existalm.n992_reserva,0)) AS xdisponible,
+pl_existalm.xalmacen_id 
+FROM pl_existalm pl_existalm
+INNER JOIN yy_ws_emp_conv conv ON pl_existalm.xempresa_id = conv.xempresa_id 
+LEFT OUTER JOIN pl_articulos a ON a.xproveedor_id = '000116' AND a.xempresa_id=conv.xempresa_id AND pl_existalm.xarticulo_id=a.xarticulo_id
+LEFT OUTER JOIN yypl_vexistalm_out outlet ON outlet.xempresa_id=pl_existalm.xempresa_id AND outlet.xalmacen_id=pl_existalm.xalmacen_id AND outlet.xarticulo_id=pl_existalm.xarticulo_id 
+LEFT OUTER JOIN pl_cli_preart prpd ON prpd.xempresa_id = 'REDI' AND prpd.xcliente_id = '000041' AND prpd.n992_referencia = a.xarticulo_id 
+LEFT OUTER JOIN pl_existalm arpd ON prpd.xempresa_id = arpd.xempresa_id AND arpd.xalmacen_id = '001' AND arpd.xarticulo_id = prpd.xarticulo_id AND arpd.xempresa_id = 'REDI'  
+) AS consulta_existencias
+WHERE xalmacen_id NOT IN ('003','010','WSIN') AND xempresa_id = 'SCHB'
+AND xarticulo_id = 'AC03292500'
+GROUP BY xempresa_id,xarticulo_id
+ORDER BY xarticulo_id;
+
+2025-3-10//12:12:6WS: existencias-art
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'bidon-cliente-articulo';
+2025-3-10//12:12:6xempresa_id --- SCHB
+2025-3-10//12:12:6xcliente_id --- 11392
+2025-3-10//12:12:6xarticulo_id --- AC03292500
+2025-3-10//12:12:6SELECT: SELECT conv.xempresa_conv_id AS xempresa_id, c.xcontrato_id, c.xcliente_id, l.xarticulo_id
+FROM n992_cli_bidones_l l
+INNER JOIN yy_ws_emp_conv conv ON l.xempresa_id = conv.xempresa_id
+INNER JOIN n992_cli_bidones_c c ON l.xempresa_id = c.xempresa_id AND l.xcontrato_id = c.xcontrato_id
+WHERE conv.xempresa_conv_id = 'SCHB'
+AND c.xcliente_id = '11392'
+AND l.xarticulo_id = 'AC03292500'
+2025-3-10//12:12:6WS: bidon-cliente-articulo
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'precios';
+2025-3-10//12:12:6xempresa_id --- SCHB
+2025-3-10//12:12:6xcliente_id --- 11392
+2025-3-10//12:12:6xarticulo_id --- AC03292500
+2025-3-10//12:12:6xcantidad --- 1
+2025-3-10//12:12:6SELECT: http://172.26.110.207:5580/api/PRUEBAS_EKON/YYWS_SalesPrices/obtener-precios-venta-intranet
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'articulos_venta_aumentada';
+2025-3-10//12:12:7xempresa_id --- SCHB
+2025-3-10//12:12:7xarticulo_id --- AC03292500
+2025-3-10//12:12:7SELECT: SELECT * 
+FROM (SELECT conv.xempresa_conv_id AS xempresa_id,prod.xarticulo_prop_id as xarticulo_id,prod.xlinea_id as xorden
+FROM yyva_producto_rel AS prod 
+INNER JOIN yy_ws_emp_conv conv ON prod.xempresa_id = conv.xempresa_id
+INNER JOIN pl_articulos a ON a.xempresa_id=conv.xempresa_id and a.xarticulo_id='AC03292500' 
+INNER JOIN n992_articulos_opc opc ON opc.xempresa_id=prod.xempresa_id AND opc.xcategoria_prod_id=prod.xcategoria_prod_id AND opc.xarticulo_id=a.xarticulo_id
+INNER JOIN yyva_categoria_pro cat ON prod.xempresa_id = cat.xempresa_id AND prod.xcategoria_prod_id = cat.xcategoria_prod_id 
+INNER JOIN pl_articulos a1 ON a1.xempresa_id=prod.xempresa_id AND a1.xarticulo_id=prod.xarticulo_prop_id and (a1.n992_publica='-1') 
+WHERE conv.xempresa_conv_id = 'SCHB' AND prod.xarticulo_prop_id IS NOT NULL 
+UNION ALL
+SELECT conv.xempresa_conv_id AS xempresa_id,prod.xart2 as xarticulo_id ,'9999' as xorden
+FROM yyventacruzada AS prod 
+INNER JOIN yy_ws_emp_conv conv ON prod.xempresa_id = conv.xempresa_id
+INNER JOIN pl_articulos a ON a.xempresa_id=conv.xempresa_id and a.xarticulo_id='AC03292500' 
+INNER JOIN pl_articulos a1 ON a1.xempresa_id=prod.xempresa_id AND a1.xarticulo_id=prod.xart2 and (a1.n992_publica='-1') AND a1.xfamilia_id NOT IN ('OUTC2','OUTC') 
+WHERE conv.xempresa_conv_id = 'SCHB' AND prod.xart1 = 'AC03292500') as DATO
+ORDER BY xorden ASC;
+2025-3-10//12:12:7WS: articulos_venta_aumentada
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'existencias-art';
+2025-3-10//12:12:8xempresa_id --- SCHB
+2025-3-10//12:12:8xarticulo_id --- 1368307337
+2025-3-10//12:12:8SELECT: SELECT xempresa_id,xarticulo_id, SUM(xdisponible) AS xdisponible, SUM(xoutlet_disponible) AS xdisponible_outlet 
+FROM (
+SELECT DISTINCT  conv.xempresa_conv_id as xempresa_id,pl_existalm.xarticulo_id,
+ISNULL(outlet.xexist_out,0) AS xoutlet_disponible,
+(isnull(pl_existalm.xexistencia,0)-isnull(pl_existalm.n992_reserva,0)) AS xdisponible,
+pl_existalm.xalmacen_id 
+FROM pl_existalm pl_existalm
+INNER JOIN yy_ws_emp_conv conv ON pl_existalm.xempresa_id = conv.xempresa_id 
+LEFT OUTER JOIN pl_articulos a ON a.xproveedor_id = '000116' AND a.xempresa_id=conv.xempresa_id AND pl_existalm.xarticulo_id=a.xarticulo_id
+LEFT OUTER JOIN yypl_vexistalm_out outlet ON outlet.xempresa_id=pl_existalm.xempresa_id AND outlet.xalmacen_id=pl_existalm.xalmacen_id AND outlet.xarticulo_id=pl_existalm.xarticulo_id 
+LEFT OUTER JOIN pl_cli_preart prpd ON prpd.xempresa_id = 'REDI' AND prpd.xcliente_id = '000041' AND prpd.n992_referencia = a.xarticulo_id 
+LEFT OUTER JOIN pl_existalm arpd ON prpd.xempresa_id = arpd.xempresa_id AND arpd.xalmacen_id = '001' AND arpd.xarticulo_id = prpd.xarticulo_id AND arpd.xempresa_id = 'REDI'  
+) AS consulta_existencias
+WHERE xalmacen_id NOT IN ('003','010','WSIN') AND xempresa_id = 'SCHB'
+AND xarticulo_id = '1368307337'
+GROUP BY xempresa_id,xarticulo_id
+ORDER BY xarticulo_id;
+
+2025-3-10//12:12:8WS: existencias-art
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'bidon-cliente-articulo';
+2025-3-10//12:12:8xempresa_id --- SCHB
+2025-3-10//12:12:8xcliente_id --- 11392
+2025-3-10//12:12:8xarticulo_id --- 1368307337
+2025-3-10//12:12:8SELECT: SELECT conv.xempresa_conv_id AS xempresa_id, c.xcontrato_id, c.xcliente_id, l.xarticulo_id
+FROM n992_cli_bidones_l l
+INNER JOIN yy_ws_emp_conv conv ON l.xempresa_id = conv.xempresa_id
+INNER JOIN n992_cli_bidones_c c ON l.xempresa_id = c.xempresa_id AND l.xcontrato_id = c.xcontrato_id
+WHERE conv.xempresa_conv_id = 'SCHB'
+AND c.xcliente_id = '11392'
+AND l.xarticulo_id = '1368307337'
+2025-3-10//12:12:8WS: bidon-cliente-articulo
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'precios';
+2025-3-10//12:12:8xempresa_id --- SCHB
+2025-3-10//12:12:8xcliente_id --- 11392
+2025-3-10//12:12:8xarticulo_id --- 1368307337
+2025-3-10//12:12:8xcantidad --- 1
+2025-3-10//12:12:8SELECT: http://172.26.110.207:5580/api/PRUEBAS_EKON/YYWS_SalesPrices/obtener-precios-venta-intranet
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'articulos_venta_aumentada';
+2025-3-10//12:12:9xempresa_id --- SCHB
+2025-3-10//12:12:9xarticulo_id --- AC03292500
+2025-3-10//12:12:9SELECT: SELECT * 
+FROM (SELECT conv.xempresa_conv_id AS xempresa_id,prod.xarticulo_prop_id as xarticulo_id,prod.xlinea_id as xorden
+FROM yyva_producto_rel AS prod 
+INNER JOIN yy_ws_emp_conv conv ON prod.xempresa_id = conv.xempresa_id
+INNER JOIN pl_articulos a ON a.xempresa_id=conv.xempresa_id and a.xarticulo_id='AC03292500' 
+INNER JOIN n992_articulos_opc opc ON opc.xempresa_id=prod.xempresa_id AND opc.xcategoria_prod_id=prod.xcategoria_prod_id AND opc.xarticulo_id=a.xarticulo_id
+INNER JOIN yyva_categoria_pro cat ON prod.xempresa_id = cat.xempresa_id AND prod.xcategoria_prod_id = cat.xcategoria_prod_id 
+INNER JOIN pl_articulos a1 ON a1.xempresa_id=prod.xempresa_id AND a1.xarticulo_id=prod.xarticulo_prop_id and (a1.n992_publica='-1') 
+WHERE conv.xempresa_conv_id = 'SCHB' AND prod.xarticulo_prop_id IS NOT NULL 
+UNION ALL
+SELECT conv.xempresa_conv_id AS xempresa_id,prod.xart2 as xarticulo_id ,'9999' as xorden
+FROM yyventacruzada AS prod 
+INNER JOIN yy_ws_emp_conv conv ON prod.xempresa_id = conv.xempresa_id
+INNER JOIN pl_articulos a ON a.xempresa_id=conv.xempresa_id and a.xarticulo_id='AC03292500' 
+INNER JOIN pl_articulos a1 ON a1.xempresa_id=prod.xempresa_id AND a1.xarticulo_id=prod.xart2 and (a1.n992_publica='-1') AND a1.xfamilia_id NOT IN ('OUTC2','OUTC') 
+WHERE conv.xempresa_conv_id = 'SCHB' AND prod.xart1 = 'AC03292500') as DATO
+ORDER BY xorden ASC;
+2025-3-10//12:12:9WS: articulos_venta_aumentada
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'existencias-art';
+2025-3-10//12:14:21xempresa_id --- SCHB
+2025-3-10//12:14:21xarticulo_id --- SO04251000
+2025-3-10//12:14:21SELECT: SELECT xempresa_id,xarticulo_id, SUM(xdisponible) AS xdisponible, SUM(xoutlet_disponible) AS xdisponible_outlet 
+FROM (
+SELECT DISTINCT  conv.xempresa_conv_id as xempresa_id,pl_existalm.xarticulo_id,
+ISNULL(outlet.xexist_out,0) AS xoutlet_disponible,
+(isnull(pl_existalm.xexistencia,0)-isnull(pl_existalm.n992_reserva,0)) AS xdisponible,
+pl_existalm.xalmacen_id 
+FROM pl_existalm pl_existalm
+INNER JOIN yy_ws_emp_conv conv ON pl_existalm.xempresa_id = conv.xempresa_id 
+LEFT OUTER JOIN pl_articulos a ON a.xproveedor_id = '000116' AND a.xempresa_id=conv.xempresa_id AND pl_existalm.xarticulo_id=a.xarticulo_id
+LEFT OUTER JOIN yypl_vexistalm_out outlet ON outlet.xempresa_id=pl_existalm.xempresa_id AND outlet.xalmacen_id=pl_existalm.xalmacen_id AND outlet.xarticulo_id=pl_existalm.xarticulo_id 
+LEFT OUTER JOIN pl_cli_preart prpd ON prpd.xempresa_id = 'REDI' AND prpd.xcliente_id = '000041' AND prpd.n992_referencia = a.xarticulo_id 
+LEFT OUTER JOIN pl_existalm arpd ON prpd.xempresa_id = arpd.xempresa_id AND arpd.xalmacen_id = '001' AND arpd.xarticulo_id = prpd.xarticulo_id AND arpd.xempresa_id = 'REDI'  
+) AS consulta_existencias
+WHERE xalmacen_id NOT IN ('003','010','WSIN') AND xempresa_id = 'SCHB'
+AND xarticulo_id = 'SO04251000'
+GROUP BY xempresa_id,xarticulo_id
+ORDER BY xarticulo_id;
+
+2025-3-10//12:14:21WS: existencias-art
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'bidon-cliente-articulo';
+2025-3-10//12:14:21xempresa_id --- SCHB
+2025-3-10//12:14:21xcliente_id --- 11392
+2025-3-10//12:14:21xarticulo_id --- SO04251000
+2025-3-10//12:14:21SELECT: SELECT conv.xempresa_conv_id AS xempresa_id, c.xcontrato_id, c.xcliente_id, l.xarticulo_id
+FROM n992_cli_bidones_l l
+INNER JOIN yy_ws_emp_conv conv ON l.xempresa_id = conv.xempresa_id
+INNER JOIN n992_cli_bidones_c c ON l.xempresa_id = c.xempresa_id AND l.xcontrato_id = c.xcontrato_id
+WHERE conv.xempresa_conv_id = 'SCHB'
+AND c.xcliente_id = '11392'
+AND l.xarticulo_id = 'SO04251000'
+2025-3-10//12:14:21WS: bidon-cliente-articulo
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'precios';
+2025-3-10//12:14:21xempresa_id --- SCHB
+2025-3-10//12:14:21xcliente_id --- 11392
+2025-3-10//12:14:21xarticulo_id --- SO04251000
+2025-3-10//12:14:21xcantidad --- 1
+2025-3-10//12:14:21SELECT: http://172.26.110.207:5580/api/PRUEBAS_EKON/YYWS_SalesPrices/obtener-precios-venta-intranet
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'articulos_venta_aumentada';
+2025-3-10//12:14:22xempresa_id --- SCHB
+2025-3-10//12:14:22xarticulo_id --- SO04251000
+2025-3-10//12:14:22SELECT: SELECT * 
+FROM (SELECT conv.xempresa_conv_id AS xempresa_id,prod.xarticulo_prop_id as xarticulo_id,prod.xlinea_id as xorden
+FROM yyva_producto_rel AS prod 
+INNER JOIN yy_ws_emp_conv conv ON prod.xempresa_id = conv.xempresa_id
+INNER JOIN pl_articulos a ON a.xempresa_id=conv.xempresa_id and a.xarticulo_id='SO04251000' 
+INNER JOIN n992_articulos_opc opc ON opc.xempresa_id=prod.xempresa_id AND opc.xcategoria_prod_id=prod.xcategoria_prod_id AND opc.xarticulo_id=a.xarticulo_id
+INNER JOIN yyva_categoria_pro cat ON prod.xempresa_id = cat.xempresa_id AND prod.xcategoria_prod_id = cat.xcategoria_prod_id 
+INNER JOIN pl_articulos a1 ON a1.xempresa_id=prod.xempresa_id AND a1.xarticulo_id=prod.xarticulo_prop_id and (a1.n992_publica='-1') 
+WHERE conv.xempresa_conv_id = 'SCHB' AND prod.xarticulo_prop_id IS NOT NULL 
+UNION ALL
+SELECT conv.xempresa_conv_id AS xempresa_id,prod.xart2 as xarticulo_id ,'9999' as xorden
+FROM yyventacruzada AS prod 
+INNER JOIN yy_ws_emp_conv conv ON prod.xempresa_id = conv.xempresa_id
+INNER JOIN pl_articulos a ON a.xempresa_id=conv.xempresa_id and a.xarticulo_id='SO04251000' 
+INNER JOIN pl_articulos a1 ON a1.xempresa_id=prod.xempresa_id AND a1.xarticulo_id=prod.xart2 and (a1.n992_publica='-1') AND a1.xfamilia_id NOT IN ('OUTC2','OUTC') 
+WHERE conv.xempresa_conv_id = 'SCHB' AND prod.xart1 = 'SO04251000') as DATO
+ORDER BY xorden ASC;
+2025-3-10//12:14:22WS: articulos_venta_aumentada
+**********IA,Begining********** 1741608693010
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'IA-ped-num-pedido';
+2025-3-10//13:11:33SELECT: SELECT c.xempresa_id, c.xtipodoc_id, c.xnumdoc_id, c.xcliente_id, clic.xnif, clic.xnombre, 
+cl.xemail AS xemail_general,
+loc.n992_perconenv AS xcontacto_Pedido, loc.xemail AS xemail_envio,
+c.xfecha_pedido, c.n992_ref_cliente,
+l.xarticulo_id, l.xdescripcion, l.n992_fecha_fab, l.yy_f_prev_entga,l.xcant_ped, l.xcantidad_prin,
+CASE WHEN (l.xcant_ped = l.xcantidad_prin) THEN 'PENDIENTE' ELSE 'PARCIAL' END AS xestado,
+(SELECT cab.xfecha_pedido as Compra_fecha_pedido,cab.xnumdoc_id Compra_numero_Pedido, 
+{fn IFNULL(lin.xfecha_entrega,cab.xfecha_entrega )} AS Compra_fecha_entrega, lin.xcantidad_prin AS Compra_Cantidad_por_llegar 
+FROM imp.pl_pedpro_lin lin       
+LEFT OUTER JOIN imp.pl_pedpro_cab cab       ON   cab.xempresa_id = lin.xempresa_id       AND  cab.xseccion_id = lin.xseccion_id       AND  cab.xtipodoc_id = lin.xtipodoc_id       
+AND  cab.xnumdoc_id  = lin.xnumdoc_id       
+LEFT OUTER JOIN imp.pl_proveedores prov       ON   cab.xempresa_id   = prov.xempresa_id       AND  cab.xproveedor_id = prov.xproveedor_id  
+WHERE cab.xempresa_id  = l.xempresa_id   AND lin.xarticulo_id = l.xarticulo_id  AND lin.xlin_art_con=1  ORDER BY {fn IFNULL(lin.xfecha_entrega,cab.xfecha_pedido)}
+FOR JSON PATH ) AS Pedidos_Proveedor
+FROM pl_pedcli_cab c 
+INNER JOIN pc_clientes clic ON c.xempresa_id = clic.xempgen_id AND c.xcliente_id = clic.xcliente_id 
+INNER JOIN pl_clientes cl ON c.xempresa_id = cl.xempgen_id AND c.xcliente_id = cl.xcliente_id 
+INNER JOIN pl_pedcli_lin l ON c.xempresa_id = l.xempresa_id AND c.xseccion_id=l.xseccion_id AND c.xnumdoc_id=l.xnumdoc_id AND c.xtipodoc_id=l.xtipodoc_id AND l.xarticulo_id IS not NULL
+INNER JOIN pl_cli_env loc ON loc.xempresa_id =c.xempresa_id AND loc.xlocal_id = c.xlocal_env_id AND loc.xcliente_id=c.xcliente_id
+WHERE c.xempresa_id = 'SCHB' 
+AND c.xnumdoc_id = '871632' ;
+2025-3-10//13:11:33WS: IA-ped-num-pedido
+**********IA,Begining********** 1741608914259
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'IA-ped-num-cliente';
+2025-3-10//13:15:14SELECT: SELECT c.xempresa_id, c.xtipodoc_id, c.xnumdoc_id, c.xcliente_id, clic.xnif, clic.xnombre, 
+cl.xemail AS xemail_general,
+loc.n992_perconenv AS xcontacto_Pedido, loc.xemail AS xemail_envio,
+c.xfecha_pedido, c.n992_ref_cliente,
+l.xarticulo_id, l.xdescripcion, l.n992_fecha_fab,l.xcant_ped, l.xcantidad_prin
+FROM pl_pedcli_cab c 
+INNER JOIN pc_clientes clic ON c.xempresa_id = clic.xempgen_id AND c.xcliente_id = clic.xcliente_id 
+INNER JOIN pl_clientes cl ON c.xempresa_id = cl.xempgen_id AND c.xcliente_id = cl.xcliente_id 
+INNER JOIN pl_pedcli_lin l ON c.xempresa_id = l.xempresa_id AND c.xseccion_id=l.xseccion_id AND c.xnumdoc_id=l.xnumdoc_id AND c.xtipodoc_id=l.xtipodoc_id AND l.xarticulo_id IS not NULL
+INNER JOIN pl_cli_env loc ON loc.xempresa_id =c.xempresa_id AND loc.xlocal_id = c.xlocal_env_id AND loc.xcliente_id=c.xcliente_id
+WHERE c.xempresa_id = 'SCHB' 
+AND c.xcliente_id = '139551' ;
+2025-3-10//13:15:14WS: IA-ped-num-cliente
+**********IA,Begining********** 1741609561509
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'IA-ped-num-pedido';
+2025-3-10//13:26:1SELECT: SELECT c.xempresa_id, c.xtipodoc_id, c.xnumdoc_id, c.xcliente_id, clic.xnif, clic.xnombre, 
+cl.xemail AS xemail_general,
+loc.n992_perconenv AS xcontacto_Pedido, loc.xemail AS xemail_envio,
+c.xfecha_pedido, c.n992_ref_cliente,
+l.xarticulo_id, l.xdescripcion, l.n992_fecha_fab, l.yy_f_prev_entga,l.xcant_ped, l.xcantidad_prin,
+CASE WHEN (l.xcant_ped = l.xcantidad_prin) THEN 'PENDIENTE' ELSE 'PARCIAL' END AS xestado,
+(SELECT cab.xfecha_pedido as Compra_fecha_pedido,cab.xnumdoc_id Compra_numero_Pedido, 
+{fn IFNULL(lin.xfecha_entrega,cab.xfecha_entrega )} AS Compra_fecha_entrega, lin.xcantidad_prin AS Compra_Cantidad_por_llegar 
+FROM imp.pl_pedpro_lin lin       
+LEFT OUTER JOIN imp.pl_pedpro_cab cab       ON   cab.xempresa_id = lin.xempresa_id       AND  cab.xseccion_id = lin.xseccion_id       AND  cab.xtipodoc_id = lin.xtipodoc_id       
+AND  cab.xnumdoc_id  = lin.xnumdoc_id       
+LEFT OUTER JOIN imp.pl_proveedores prov       ON   cab.xempresa_id   = prov.xempresa_id       AND  cab.xproveedor_id = prov.xproveedor_id  
+WHERE cab.xempresa_id  = l.xempresa_id   AND lin.xarticulo_id = l.xarticulo_id  AND lin.xlin_art_con=1  ORDER BY {fn IFNULL(lin.xfecha_entrega,cab.xfecha_pedido)}
+FOR JSON PATH ) AS Pedidos_Proveedor
+FROM pl_pedcli_cab c 
+INNER JOIN pc_clientes clic ON c.xempresa_id = clic.xempgen_id AND c.xcliente_id = clic.xcliente_id 
+INNER JOIN pl_clientes cl ON c.xempresa_id = cl.xempgen_id AND c.xcliente_id = cl.xcliente_id 
+INNER JOIN pl_pedcli_lin l ON c.xempresa_id = l.xempresa_id AND c.xseccion_id=l.xseccion_id AND c.xnumdoc_id=l.xnumdoc_id AND c.xtipodoc_id=l.xtipodoc_id AND l.xarticulo_id IS not NULL
+INNER JOIN pl_cli_env loc ON loc.xempresa_id =c.xempresa_id AND loc.xlocal_id = c.xlocal_env_id AND loc.xcliente_id=c.xcliente_id
+WHERE c.xempresa_id = 'SCHB' 
+AND c.xnumdoc_id = '871632' ;
+2025-3-10//13:26:1WS: IA-ped-num-pedido
+**********IA,Begining********** 1741611060147
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'IA-ped-num-pedido';
+2025-3-10//13:51:0SELECT: SELECT c.xempresa_id, c.xtipodoc_id, c.xnumdoc_id, c.xcliente_id, clic.xnif, clic.xnombre, 
+cl.xemail AS xemail_general,
+loc.n992_perconenv AS xcontacto_Pedido, loc.xemail AS xemail_envio,
+c.xfecha_pedido, c.n992_ref_cliente,
+l.xarticulo_id, l.xdescripcion, l.n992_fecha_fab, l.yy_f_prev_entga,l.xcant_ped, l.xcantidad_prin,
+CASE WHEN (l.xcant_ped = l.xcantidad_prin) THEN 'PENDIENTE' ELSE 'PARCIAL' END AS xestado,
+(SELECT cab.xfecha_pedido as Compra_fecha_pedido,cab.xnumdoc_id Compra_numero_Pedido, 
+{fn IFNULL(lin.xfecha_entrega,cab.xfecha_entrega )} AS Compra_fecha_entrega, lin.xcantidad_prin AS Compra_Cantidad_por_llegar 
+FROM imp.pl_pedpro_lin lin       
+LEFT OUTER JOIN imp.pl_pedpro_cab cab       ON   cab.xempresa_id = lin.xempresa_id       AND  cab.xseccion_id = lin.xseccion_id       AND  cab.xtipodoc_id = lin.xtipodoc_id       
+AND  cab.xnumdoc_id  = lin.xnumdoc_id       
+LEFT OUTER JOIN imp.pl_proveedores prov       ON   cab.xempresa_id   = prov.xempresa_id       AND  cab.xproveedor_id = prov.xproveedor_id  
+WHERE cab.xempresa_id  = l.xempresa_id   AND lin.xarticulo_id = l.xarticulo_id  AND lin.xlin_art_con=1  ORDER BY {fn IFNULL(lin.xfecha_entrega,cab.xfecha_pedido)}
+FOR JSON PATH ) AS Pedidos_Proveedor
+FROM pl_pedcli_cab c 
+INNER JOIN pc_clientes clic ON c.xempresa_id = clic.xempgen_id AND c.xcliente_id = clic.xcliente_id 
+INNER JOIN pl_clientes cl ON c.xempresa_id = cl.xempgen_id AND c.xcliente_id = cl.xcliente_id 
+INNER JOIN pl_pedcli_lin l ON c.xempresa_id = l.xempresa_id AND c.xseccion_id=l.xseccion_id AND c.xnumdoc_id=l.xnumdoc_id AND c.xtipodoc_id=l.xtipodoc_id AND l.xarticulo_id IS not NULL
+INNER JOIN pl_cli_env loc ON loc.xempresa_id =c.xempresa_id AND loc.xlocal_id = c.xlocal_env_id AND loc.xcliente_id=c.xcliente_id
+WHERE c.xempresa_id = 'SCHB' 
+AND c.xnumdoc_id = '871632' ;
+2025-3-10//13:51:0WS: IA-ped-num-pedido
+**********IA,Begining********** 1741611380021
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'IA-ped-num-pedido';
+2025-3-10//13:56:20SELECT: SELECT c.xempresa_id, c.xtipodoc_id, c.xnumdoc_id, c.xcliente_id, clic.xnif, clic.xnombre, 
+cl.xemail AS xemail_general,
+loc.n992_perconenv AS xcontacto_Pedido, loc.xemail AS xemail_envio,
+c.xfecha_pedido, c.n992_ref_cliente,
+l.xarticulo_id, l.xdescripcion, l.n992_fecha_fab, l.yy_f_prev_entga,l.xcant_ped, l.xcantidad_prin,
+CASE WHEN (l.xcant_ped = l.xcantidad_prin) THEN 'PENDIENTE' ELSE 'PARCIAL' END AS xestado,
+(SELECT cab.xfecha_pedido as Compra_fecha_pedido,cab.xnumdoc_id Compra_numero_Pedido, 
+{fn IFNULL(lin.xfecha_entrega,cab.xfecha_entrega )} AS Compra_fecha_entrega, lin.xcantidad_prin AS Compra_Cantidad_por_llegar 
+FROM imp.pl_pedpro_lin lin       
+LEFT OUTER JOIN imp.pl_pedpro_cab cab       ON   cab.xempresa_id = lin.xempresa_id       AND  cab.xseccion_id = lin.xseccion_id       AND  cab.xtipodoc_id = lin.xtipodoc_id       
+AND  cab.xnumdoc_id  = lin.xnumdoc_id       
+LEFT OUTER JOIN imp.pl_proveedores prov       ON   cab.xempresa_id   = prov.xempresa_id       AND  cab.xproveedor_id = prov.xproveedor_id  
+WHERE cab.xempresa_id  = l.xempresa_id   AND lin.xarticulo_id = l.xarticulo_id  AND lin.xlin_art_con=1  ORDER BY {fn IFNULL(lin.xfecha_entrega,cab.xfecha_pedido)}
+FOR JSON PATH ) AS Pedidos_Proveedor
+FROM pl_pedcli_cab c 
+INNER JOIN pc_clientes clic ON c.xempresa_id = clic.xempgen_id AND c.xcliente_id = clic.xcliente_id 
+INNER JOIN pl_clientes cl ON c.xempresa_id = cl.xempgen_id AND c.xcliente_id = cl.xcliente_id 
+INNER JOIN pl_pedcli_lin l ON c.xempresa_id = l.xempresa_id AND c.xseccion_id=l.xseccion_id AND c.xnumdoc_id=l.xnumdoc_id AND c.xtipodoc_id=l.xtipodoc_id AND l.xarticulo_id IS not NULL
+INNER JOIN pl_cli_env loc ON loc.xempresa_id =c.xempresa_id AND loc.xlocal_id = c.xlocal_env_id AND loc.xcliente_id=c.xcliente_id
+WHERE c.xempresa_id = 'SCHB' 
+AND c.xnumdoc_id = '871632' ;
+2025-3-10//13:56:20WS: IA-ped-num-pedido
+**********IA,Begining********** 1741615618899
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'IA-ped-num-pedido';
+2025-3-10//15:6:58SELECT: SELECT c.xempresa_id, c.xtipodoc_id, c.xnumdoc_id, c.xcliente_id, clic.xnif, clic.xnombre, 
+cl.xemail AS xemail_general,
+loc.n992_perconenv AS xcontacto_Pedido, loc.xemail AS xemail_envio,
+c.xfecha_pedido, c.n992_ref_cliente,
+l.xarticulo_id, l.xdescripcion, l.n992_fecha_fab, l.yy_f_prev_entga,l.xcant_ped, l.xcantidad_prin,
+CASE WHEN (l.xcant_ped = l.xcantidad_prin) THEN 'PENDIENTE' ELSE 'PARCIAL' END AS xestado,
+(SELECT cab.xfecha_pedido as Compra_fecha_pedido,cab.xnumdoc_id Compra_numero_Pedido, 
+{fn IFNULL(lin.xfecha_entrega,cab.xfecha_entrega )} AS Compra_fecha_entrega, lin.xcantidad_prin AS Compra_Cantidad_por_llegar 
+FROM imp.pl_pedpro_lin lin       
+LEFT OUTER JOIN imp.pl_pedpro_cab cab       ON   cab.xempresa_id = lin.xempresa_id       AND  cab.xseccion_id = lin.xseccion_id       AND  cab.xtipodoc_id = lin.xtipodoc_id       
+AND  cab.xnumdoc_id  = lin.xnumdoc_id       
+LEFT OUTER JOIN imp.pl_proveedores prov       ON   cab.xempresa_id   = prov.xempresa_id       AND  cab.xproveedor_id = prov.xproveedor_id  
+WHERE cab.xempresa_id  = l.xempresa_id   AND lin.xarticulo_id = l.xarticulo_id  AND lin.xlin_art_con=1  ORDER BY {fn IFNULL(lin.xfecha_entrega,cab.xfecha_pedido)}
+FOR JSON PATH ) AS Pedidos_Proveedor
+FROM pl_pedcli_cab c 
+INNER JOIN pc_clientes clic ON c.xempresa_id = clic.xempgen_id AND c.xcliente_id = clic.xcliente_id 
+INNER JOIN pl_clientes cl ON c.xempresa_id = cl.xempgen_id AND c.xcliente_id = cl.xcliente_id 
+INNER JOIN pl_pedcli_lin l ON c.xempresa_id = l.xempresa_id AND c.xseccion_id=l.xseccion_id AND c.xnumdoc_id=l.xnumdoc_id AND c.xtipodoc_id=l.xtipodoc_id AND l.xarticulo_id IS not NULL
+INNER JOIN pl_cli_env loc ON loc.xempresa_id =c.xempresa_id AND loc.xlocal_id = c.xlocal_env_id AND loc.xcliente_id=c.xcliente_id
+WHERE c.xempresa_id = 'SCHB' 
+AND c.xnumdoc_id = '871632' ;
+2025-3-10//15:6:59WS: IA-ped-num-pedido
+**********IA,Begining********** 1741615800052
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'IA-ped-num-pedido';
+2025-3-10//15:10:0SELECT: SELECT c.xempresa_id, c.xtipodoc_id, c.xnumdoc_id, c.xcliente_id, clic.xnif, clic.xnombre, 
+cl.xemail AS xemail_general,
+loc.n992_perconenv AS xcontacto_Pedido, loc.xemail AS xemail_envio,
+c.xfecha_pedido, c.n992_ref_cliente,
+l.xarticulo_id, l.xdescripcion, l.n992_fecha_fab, l.yy_f_prev_entga,l.xcant_ped, l.xcantidad_prin,
+CASE WHEN (l.xcant_ped = l.xcantidad_prin) THEN 'PENDIENTE' ELSE 'PARCIAL' END AS xestado,
+(SELECT cab.xfecha_pedido as Compra_fecha_pedido,cab.xnumdoc_id Compra_numero_Pedido, 
+{fn IFNULL(lin.xfecha_entrega,cab.xfecha_entrega )} AS Compra_fecha_entrega, lin.xcantidad_prin AS Compra_Cantidad_por_llegar 
+FROM imp.pl_pedpro_lin lin       
+LEFT OUTER JOIN imp.pl_pedpro_cab cab       ON   cab.xempresa_id = lin.xempresa_id       AND  cab.xseccion_id = lin.xseccion_id       AND  cab.xtipodoc_id = lin.xtipodoc_id       
+AND  cab.xnumdoc_id  = lin.xnumdoc_id       
+LEFT OUTER JOIN imp.pl_proveedores prov       ON   cab.xempresa_id   = prov.xempresa_id       AND  cab.xproveedor_id = prov.xproveedor_id  
+WHERE cab.xempresa_id  = l.xempresa_id   AND lin.xarticulo_id = l.xarticulo_id  AND lin.xlin_art_con=1  ORDER BY {fn IFNULL(lin.xfecha_entrega,cab.xfecha_pedido)}
+FOR JSON PATH ) AS Pedidos_Proveedor
+FROM pl_pedcli_cab c 
+INNER JOIN pc_clientes clic ON c.xempresa_id = clic.xempgen_id AND c.xcliente_id = clic.xcliente_id 
+INNER JOIN pl_clientes cl ON c.xempresa_id = cl.xempgen_id AND c.xcliente_id = cl.xcliente_id 
+INNER JOIN pl_pedcli_lin l ON c.xempresa_id = l.xempresa_id AND c.xseccion_id=l.xseccion_id AND c.xnumdoc_id=l.xnumdoc_id AND c.xtipodoc_id=l.xtipodoc_id AND l.xarticulo_id IS not NULL
+INNER JOIN pl_cli_env loc ON loc.xempresa_id =c.xempresa_id AND loc.xlocal_id = c.xlocal_env_id AND loc.xcliente_id=c.xcliente_id
+WHERE c.xempresa_id = 'SCHB' 
+AND c.xnumdoc_id = '871632' ;
+2025-3-10//15:10:0WS: IA-ped-num-pedido
+**********IA,Begining********** 1741615922119
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'IA-ped-num-pedido';
+2025-3-10//15:12:2SELECT: SELECT c.xempresa_id, c.xtipodoc_id, c.xnumdoc_id, c.xcliente_id, clic.xnif, clic.xnombre, 
+cl.xemail AS xemail_general,
+loc.n992_perconenv AS xcontacto_Pedido, loc.xemail AS xemail_envio,
+c.xfecha_pedido, c.n992_ref_cliente,
+l.xarticulo_id, l.xdescripcion, l.n992_fecha_fab, l.yy_f_prev_entga,l.xcant_ped, l.xcantidad_prin,
+CASE WHEN (l.xcant_ped = l.xcantidad_prin) THEN 'PENDIENTE' ELSE 'PARCIAL' END AS xestado,
+(SELECT cab.xfecha_pedido as Compra_fecha_pedido,cab.xnumdoc_id Compra_numero_Pedido, 
+{fn IFNULL(lin.xfecha_entrega,cab.xfecha_entrega )} AS Compra_fecha_entrega, lin.xcantidad_prin AS Compra_Cantidad_por_llegar 
+FROM imp.pl_pedpro_lin lin       
+LEFT OUTER JOIN imp.pl_pedpro_cab cab       ON   cab.xempresa_id = lin.xempresa_id       AND  cab.xseccion_id = lin.xseccion_id       AND  cab.xtipodoc_id = lin.xtipodoc_id       
+AND  cab.xnumdoc_id  = lin.xnumdoc_id       
+LEFT OUTER JOIN imp.pl_proveedores prov       ON   cab.xempresa_id   = prov.xempresa_id       AND  cab.xproveedor_id = prov.xproveedor_id  
+WHERE cab.xempresa_id  = l.xempresa_id   AND lin.xarticulo_id = l.xarticulo_id  AND lin.xlin_art_con=1  ORDER BY {fn IFNULL(lin.xfecha_entrega,cab.xfecha_pedido)}
+FOR JSON PATH ) AS Pedidos_Proveedor
+FROM pl_pedcli_cab c 
+INNER JOIN pc_clientes clic ON c.xempresa_id = clic.xempgen_id AND c.xcliente_id = clic.xcliente_id 
+INNER JOIN pl_clientes cl ON c.xempresa_id = cl.xempgen_id AND c.xcliente_id = cl.xcliente_id 
+INNER JOIN pl_pedcli_lin l ON c.xempresa_id = l.xempresa_id AND c.xseccion_id=l.xseccion_id AND c.xnumdoc_id=l.xnumdoc_id AND c.xtipodoc_id=l.xtipodoc_id AND l.xarticulo_id IS not NULL
+INNER JOIN pl_cli_env loc ON loc.xempresa_id =c.xempresa_id AND loc.xlocal_id = c.xlocal_env_id AND loc.xcliente_id=c.xcliente_id
+WHERE c.xempresa_id = 'SCHB' 
+AND c.xnumdoc_id = '871632' ;
+2025-3-10//15:12:2WS: IA-ped-num-pedido
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'target-distribuidor';
+2025-3-12//1:14:27xempresa_id --- SCHB
+2025-3-12//1:14:27xcliente_id --- 11392
+2025-3-12//1:14:27xciclo_id --- 2025
+2025-3-12//1:14:27SELECT: SELECT t.xciclo_id,t.xtarget, (SELECT ROUND(SUM(l.ximporte_db),0) as Ventas 
+FROM pl_fracli_cab c  
+INNER JOIN pl_fracli_lin l ON l.xempresa_id=c.xempresa_id AND l.xseccion_id=c.xseccion_id AND l.xciclo_id=c.xciclo_id AND l.xtipodoc_id=c.xtipodoc_id AND l.xnumdoc_id=c.xnumdoc_id  AND l.xarticulo_id IS NOT NULL 
+WHERE c.xempresa_id = conv.xempresa_id AND c.xcontabilizado='-1' AND c.xciclo_id=t.xciclo_id AND c.xcliente_id=t.xcliente_id ) as Sales, ROUND (((t.xtarget/12)*(MONTH(GETDATE())-1)),0) AS Expected 
+FROM n992_cli_target t  
+INNER JOIN yy_ws_emp_conv conv ON t.xempresa_id = conv.xempresa_id  
+WHERE conv.xempresa_conv_id = 'SCHB' AND t.xciclo_id='2025' AND t.xcliente_id='11392';
+2025-3-12//1:14:27WS: target-distribuidor
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'existencias-art';
+2025-3-12//1:15:30xempresa_id --- SCHB
+2025-3-12//1:15:30xarticulo_id --- SO04251000
+2025-3-12//1:15:30SELECT: SELECT xempresa_id,xarticulo_id, SUM(xdisponible) AS xdisponible, SUM(xoutlet_disponible) AS xdisponible_outlet 
+FROM (
+SELECT DISTINCT  conv.xempresa_conv_id as xempresa_id,pl_existalm.xarticulo_id,
+ISNULL(outlet.xexist_out,0) AS xoutlet_disponible,
+(isnull(pl_existalm.xexistencia,0)-isnull(pl_existalm.n992_reserva,0)) AS xdisponible,
+pl_existalm.xalmacen_id 
+FROM pl_existalm pl_existalm
+INNER JOIN yy_ws_emp_conv conv ON pl_existalm.xempresa_id = conv.xempresa_id 
+LEFT OUTER JOIN pl_articulos a ON a.xproveedor_id = '000116' AND a.xempresa_id=conv.xempresa_id AND pl_existalm.xarticulo_id=a.xarticulo_id
+LEFT OUTER JOIN yypl_vexistalm_out outlet ON outlet.xempresa_id=pl_existalm.xempresa_id AND outlet.xalmacen_id=pl_existalm.xalmacen_id AND outlet.xarticulo_id=pl_existalm.xarticulo_id 
+LEFT OUTER JOIN pl_cli_preart prpd ON prpd.xempresa_id = 'REDI' AND prpd.xcliente_id = '000041' AND prpd.n992_referencia = a.xarticulo_id 
+LEFT OUTER JOIN pl_existalm arpd ON prpd.xempresa_id = arpd.xempresa_id AND arpd.xalmacen_id = '001' AND arpd.xarticulo_id = prpd.xarticulo_id AND arpd.xempresa_id = 'REDI'  
+) AS consulta_existencias
+WHERE xalmacen_id NOT IN ('003','010','WSIN') AND xempresa_id = 'SCHB'
+AND xarticulo_id = 'SO04251000'
+GROUP BY xempresa_id,xarticulo_id
+ORDER BY xarticulo_id;
+
+2025-3-12//1:15:30WS: existencias-art
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'bidon-cliente-articulo';
+2025-3-12//1:15:30xempresa_id --- SCHB
+2025-3-12//1:15:30xcliente_id --- 11392
+2025-3-12//1:15:30xarticulo_id --- SO04251000
+2025-3-12//1:15:30SELECT: SELECT conv.xempresa_conv_id AS xempresa_id, c.xcontrato_id, c.xcliente_id, l.xarticulo_id
+FROM n992_cli_bidones_l l
+INNER JOIN yy_ws_emp_conv conv ON l.xempresa_id = conv.xempresa_id
+INNER JOIN n992_cli_bidones_c c ON l.xempresa_id = c.xempresa_id AND l.xcontrato_id = c.xcontrato_id
+WHERE conv.xempresa_conv_id = 'SCHB'
+AND c.xcliente_id = '11392'
+AND l.xarticulo_id = 'SO04251000'
+2025-3-12//1:15:30WS: bidon-cliente-articulo
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'precios';
+2025-3-12//1:15:30xempresa_id --- SCHB
+2025-3-12//1:15:30xcliente_id --- 11392
+2025-3-12//1:15:30xarticulo_id --- SO04251000
+2025-3-12//1:15:30xcantidad --- 1
+2025-3-12//1:15:30SELECT: http://172.26.110.207:5580/api/PRUEBAS_EKON/YYWS_SalesPrices/obtener-precios-venta-intranet
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'articulos_venta_aumentada';
+2025-3-12//1:15:33xempresa_id --- SCHB
+2025-3-12//1:15:33xarticulo_id --- SO04251000
+2025-3-12//1:15:33SELECT: SELECT * 
+FROM (SELECT conv.xempresa_conv_id AS xempresa_id,prod.xarticulo_prop_id as xarticulo_id,prod.xlinea_id as xorden
+FROM yyva_producto_rel AS prod 
+INNER JOIN yy_ws_emp_conv conv ON prod.xempresa_id = conv.xempresa_id
+INNER JOIN pl_articulos a ON a.xempresa_id=conv.xempresa_id and a.xarticulo_id='SO04251000' 
+INNER JOIN n992_articulos_opc opc ON opc.xempresa_id=prod.xempresa_id AND opc.xcategoria_prod_id=prod.xcategoria_prod_id AND opc.xarticulo_id=a.xarticulo_id
+INNER JOIN yyva_categoria_pro cat ON prod.xempresa_id = cat.xempresa_id AND prod.xcategoria_prod_id = cat.xcategoria_prod_id 
+INNER JOIN pl_articulos a1 ON a1.xempresa_id=prod.xempresa_id AND a1.xarticulo_id=prod.xarticulo_prop_id and (a1.n992_publica='-1') 
+WHERE conv.xempresa_conv_id = 'SCHB' AND prod.xarticulo_prop_id IS NOT NULL 
+UNION ALL
+SELECT conv.xempresa_conv_id AS xempresa_id,prod.xart2 as xarticulo_id ,'9999' as xorden
+FROM yyventacruzada AS prod 
+INNER JOIN yy_ws_emp_conv conv ON prod.xempresa_id = conv.xempresa_id
+INNER JOIN pl_articulos a ON a.xempresa_id=conv.xempresa_id and a.xarticulo_id='SO04251000' 
+INNER JOIN pl_articulos a1 ON a1.xempresa_id=prod.xempresa_id AND a1.xarticulo_id=prod.xart2 and (a1.n992_publica='-1') AND a1.xfamilia_id NOT IN ('OUTC2','OUTC') 
+WHERE conv.xempresa_conv_id = 'SCHB' AND prod.xart1 = 'SO04251000') as DATO
+ORDER BY xorden ASC;
+2025-3-12//1:15:33WS: articulos_venta_aumentada
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'articulos_venta_aumentada';
+2025-3-12//1:19:12xempresa_id --- SCHB
+2025-3-12//1:19:12xarticulo_id --- SO04251000
+2025-3-12//1:19:12SELECT: SELECT * 
+FROM (SELECT conv.xempresa_conv_id AS xempresa_id,prod.xarticulo_prop_id as xarticulo_id,prod.xlinea_id as xorden
+FROM yyva_producto_rel AS prod 
+INNER JOIN yy_ws_emp_conv conv ON prod.xempresa_id = conv.xempresa_id
+INNER JOIN pl_articulos a ON a.xempresa_id=conv.xempresa_id and a.xarticulo_id='SO04251000' 
+INNER JOIN n992_articulos_opc opc ON opc.xempresa_id=prod.xempresa_id AND opc.xcategoria_prod_id=prod.xcategoria_prod_id AND opc.xarticulo_id=a.xarticulo_id
+INNER JOIN yyva_categoria_pro cat ON prod.xempresa_id = cat.xempresa_id AND prod.xcategoria_prod_id = cat.xcategoria_prod_id 
+INNER JOIN pl_articulos a1 ON a1.xempresa_id=prod.xempresa_id AND a1.xarticulo_id=prod.xarticulo_prop_id and (a1.n992_publica='-1') 
+WHERE conv.xempresa_conv_id = 'SCHB' AND prod.xarticulo_prop_id IS NOT NULL 
+UNION ALL
+SELECT conv.xempresa_conv_id AS xempresa_id,prod.xart2 as xarticulo_id ,'9999' as xorden
+FROM yyventacruzada AS prod 
+INNER JOIN yy_ws_emp_conv conv ON prod.xempresa_id = conv.xempresa_id
+INNER JOIN pl_articulos a ON a.xempresa_id=conv.xempresa_id and a.xarticulo_id='SO04251000' 
+INNER JOIN pl_articulos a1 ON a1.xempresa_id=prod.xempresa_id AND a1.xarticulo_id=prod.xart2 and (a1.n992_publica='-1') AND a1.xfamilia_id NOT IN ('OUTC2','OUTC') 
+WHERE conv.xempresa_conv_id = 'SCHB' AND prod.xart1 = 'SO04251000') as DATO
+ORDER BY xorden ASC;
+2025-3-12//1:19:12WS: articulos_venta_aumentada
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'existencias-art';
+2025-3-12//1:25:47xempresa_id --- SCHB
+2025-3-12//1:25:47xarticulo_id --- SO04251000
+2025-3-12//1:25:47SELECT: SELECT xempresa_id,xarticulo_id, SUM(xdisponible) AS xdisponible, SUM(xoutlet_disponible) AS xdisponible_outlet 
+FROM (
+SELECT DISTINCT  conv.xempresa_conv_id as xempresa_id,pl_existalm.xarticulo_id,
+ISNULL(outlet.xexist_out,0) AS xoutlet_disponible,
+(isnull(pl_existalm.xexistencia,0)-isnull(pl_existalm.n992_reserva,0)) AS xdisponible,
+pl_existalm.xalmacen_id 
+FROM pl_existalm pl_existalm
+INNER JOIN yy_ws_emp_conv conv ON pl_existalm.xempresa_id = conv.xempresa_id 
+LEFT OUTER JOIN pl_articulos a ON a.xproveedor_id = '000116' AND a.xempresa_id=conv.xempresa_id AND pl_existalm.xarticulo_id=a.xarticulo_id
+LEFT OUTER JOIN yypl_vexistalm_out outlet ON outlet.xempresa_id=pl_existalm.xempresa_id AND outlet.xalmacen_id=pl_existalm.xalmacen_id AND outlet.xarticulo_id=pl_existalm.xarticulo_id 
+LEFT OUTER JOIN pl_cli_preart prpd ON prpd.xempresa_id = 'REDI' AND prpd.xcliente_id = '000041' AND prpd.n992_referencia = a.xarticulo_id 
+LEFT OUTER JOIN pl_existalm arpd ON prpd.xempresa_id = arpd.xempresa_id AND arpd.xalmacen_id = '001' AND arpd.xarticulo_id = prpd.xarticulo_id AND arpd.xempresa_id = 'REDI'  
+) AS consulta_existencias
+WHERE xalmacen_id NOT IN ('003','010','WSIN') AND xempresa_id = 'SCHB'
+AND xarticulo_id = 'SO04251000'
+GROUP BY xempresa_id,xarticulo_id
+ORDER BY xarticulo_id;
+
+2025-3-12//1:25:47WS: existencias-art
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'bidon-cliente-articulo';
+2025-3-12//1:25:47xempresa_id --- SCHB
+2025-3-12//1:25:47xcliente_id --- 11392
+2025-3-12//1:25:47xarticulo_id --- SO04251000
+2025-3-12//1:25:47SELECT: SELECT conv.xempresa_conv_id AS xempresa_id, c.xcontrato_id, c.xcliente_id, l.xarticulo_id
+FROM n992_cli_bidones_l l
+INNER JOIN yy_ws_emp_conv conv ON l.xempresa_id = conv.xempresa_id
+INNER JOIN n992_cli_bidones_c c ON l.xempresa_id = c.xempresa_id AND l.xcontrato_id = c.xcontrato_id
+WHERE conv.xempresa_conv_id = 'SCHB'
+AND c.xcliente_id = '11392'
+AND l.xarticulo_id = 'SO04251000'
+2025-3-12//1:25:47WS: bidon-cliente-articulo
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'precios';
+2025-3-12//1:25:47xempresa_id --- SCHB
+2025-3-12//1:25:47xcliente_id --- 11392
+2025-3-12//1:25:47xarticulo_id --- SO04251000
+2025-3-12//1:25:47xcantidad --- 1
+2025-3-12//1:25:47SELECT: http://172.26.110.207:5580/api/PRUEBAS_EKON/YYWS_SalesPrices/obtener-precios-venta-intranet
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'articulos_venta_aumentada';
+2025-3-12//1:25:47xempresa_id --- SCHB
+2025-3-12//1:25:47xarticulo_id --- SO04251000
+2025-3-12//1:25:47SELECT: SELECT * 
+FROM (SELECT conv.xempresa_conv_id AS xempresa_id,prod.xarticulo_prop_id as xarticulo_id,prod.xlinea_id as xorden
+FROM yyva_producto_rel AS prod 
+INNER JOIN yy_ws_emp_conv conv ON prod.xempresa_id = conv.xempresa_id
+INNER JOIN pl_articulos a ON a.xempresa_id=conv.xempresa_id and a.xarticulo_id='SO04251000' 
+INNER JOIN n992_articulos_opc opc ON opc.xempresa_id=prod.xempresa_id AND opc.xcategoria_prod_id=prod.xcategoria_prod_id AND opc.xarticulo_id=a.xarticulo_id
+INNER JOIN yyva_categoria_pro cat ON prod.xempresa_id = cat.xempresa_id AND prod.xcategoria_prod_id = cat.xcategoria_prod_id 
+INNER JOIN pl_articulos a1 ON a1.xempresa_id=prod.xempresa_id AND a1.xarticulo_id=prod.xarticulo_prop_id and (a1.n992_publica='-1') 
+WHERE conv.xempresa_conv_id = 'SCHB' AND prod.xarticulo_prop_id IS NOT NULL 
+UNION ALL
+SELECT conv.xempresa_conv_id AS xempresa_id,prod.xart2 as xarticulo_id ,'9999' as xorden
+FROM yyventacruzada AS prod 
+INNER JOIN yy_ws_emp_conv conv ON prod.xempresa_id = conv.xempresa_id
+INNER JOIN pl_articulos a ON a.xempresa_id=conv.xempresa_id and a.xarticulo_id='SO04251000' 
+INNER JOIN pl_articulos a1 ON a1.xempresa_id=prod.xempresa_id AND a1.xarticulo_id=prod.xart2 and (a1.n992_publica='-1') AND a1.xfamilia_id NOT IN ('OUTC2','OUTC') 
+WHERE conv.xempresa_conv_id = 'SCHB' AND prod.xart1 = 'SO04251000') as DATO
+ORDER BY xorden ASC;
+2025-3-12//1:25:47WS: articulos_venta_aumentada
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'target-distribuidor';
+2025-3-12//8:48:3xempresa_id --- SCHB
+2025-3-12//8:48:3xcliente_id --- 11392
+2025-3-12//8:48:3xciclo_id --- 2025
+2025-3-12//8:48:3SELECT: SELECT t.xciclo_id,t.xtarget, (SELECT ROUND(SUM(l.ximporte_db),0) as Ventas 
+FROM pl_fracli_cab c  
+INNER JOIN pl_fracli_lin l ON l.xempresa_id=c.xempresa_id AND l.xseccion_id=c.xseccion_id AND l.xciclo_id=c.xciclo_id AND l.xtipodoc_id=c.xtipodoc_id AND l.xnumdoc_id=c.xnumdoc_id  AND l.xarticulo_id IS NOT NULL 
+WHERE c.xempresa_id = conv.xempresa_id AND c.xcontabilizado='-1' AND c.xciclo_id=t.xciclo_id AND c.xcliente_id=t.xcliente_id ) as Sales, ROUND (((t.xtarget/12)*(MONTH(GETDATE())-1)),0) AS Expected 
+FROM n992_cli_target t  
+INNER JOIN yy_ws_emp_conv conv ON t.xempresa_id = conv.xempresa_id  
+WHERE conv.xempresa_conv_id = 'SCHB' AND t.xciclo_id='2025' AND t.xcliente_id='11392';
+2025-3-12//8:48:4WS: target-distribuidor
+xtipo: 1
+2025-3-12//8:48:22SELECT OK: SELECT DISTINCT TOP 500 dato.xarticulo_id,
+isnull(ex.xdisponible,0) AS xdisponible,
+CASE WHEN (ISNULL(m.xgrupo,'999')>0) THEN 1 ELSE  m.xgrupo END AS xorden,
+xindexbuscar 
+FROM (
+SELECT conv.xempresa_id as xempresa_id, s.xarticulo_id, CHARINDEX('ac0329',s.xbusqueda) as xindexbuscar FROM n992_wc_superquery as s 
+INNER JOIN yy_ws_emp_conv conv WITH (NOLOCK) ON s.xempresa_id = conv.xempresa_id 
+WHERE conv.xempresa_conv_id='SCHB'  
+ AND ( CONTAINS (s.xbusqueda, '"ac0329*"', language 3082)  )  
+UNION
+SELECT conv.xempresa_id as xempresa_id, alt.xref_alternativa AS xarticulo_id, CHARINDEX('ac0329',s.xbusqueda)+1 as xindexbuscar FROM n992_wc_superquery as s 
+INNER JOIN yy_ws_emp_conv conv WITH (NOLOCK) ON s.xempresa_id = conv.xempresa_id 
+INNER JOIN yy_ref_alterna_art alt WITH (NOLOCK) ON alt.xempresa_id=s.xempresa_id AND alt.xarticulo_id=s.xarticulo_id
+WHERE conv.xempresa_conv_id='SCHB'  
+ AND ( CONTAINS (s.xbusqueda, '"ac0329*"', language 3082)  )  
+) as dato 
+INNER JOIN pl_articulos a WITH (NOLOCK) ON dato.xempresa_id = a.xempresa_id AND dato.xarticulo_id = a.xarticulo_id AND a.n992_baja != '-1' AND a.n992_descat != '-1' 
+INNER JOIN pl_familias f WITH (NOLOCK) ON f.xempresa_id=a.xempresa_id AND f.xfamilia_id=a.xfamilia_id  AND ISNULL(f.n992_linea,'00')<>'11' 
+INNER JOIN n992_marcasart m WITH (NOLOCK) ON m.xempresa_id=a.xempresa_id AND m.xmarca_id=a.n992_marca 
+LEFT OUTER JOIN yy_ws_existencias ex WITH (NOLOCK) ON ex.xempresa_id=a.xempresa_id AND ex.xarticulo_id=a.xarticulo_id 
+LEFT OUTER JOIN imp.yy_ws_art_cli_ano cli ON cli.XEMPRESA_ID=a.xempresa_id AND cli.XCLIENTE_ID= '11392' AND cli.XARTICULO_ID=a.xarticulo_id 
+LEFT OUTER JOIN imp.pl_cli_preart pesp ON pesp.xempresa_id=a.xempresa_id AND pesp.xcliente_id='11392' AND pesp.xarticulo_id=a.xarticulo_id 
+WHERE ( (a.n992_intranet='-1')  OR (ISNULL(pesp.xprecio,0)<>0) )
+ORDER BY xorden, xindexbuscar, xdisponible DESC, xarticulo_id;
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'existencias-art';
+2025-3-12//8:48:26xempresa_id --- SCHB
+2025-3-12//8:48:26xarticulo_id --- AC03292500
+2025-3-12//8:48:26SELECT: SELECT xempresa_id,xarticulo_id, SUM(xdisponible) AS xdisponible, SUM(xoutlet_disponible) AS xdisponible_outlet 
+FROM (
+SELECT DISTINCT  conv.xempresa_conv_id as xempresa_id,pl_existalm.xarticulo_id,
+ISNULL(outlet.xexist_out,0) AS xoutlet_disponible,
+(isnull(pl_existalm.xexistencia,0)-isnull(pl_existalm.n992_reserva,0)) AS xdisponible,
+pl_existalm.xalmacen_id 
+FROM pl_existalm pl_existalm
+INNER JOIN yy_ws_emp_conv conv ON pl_existalm.xempresa_id = conv.xempresa_id 
+LEFT OUTER JOIN pl_articulos a ON a.xproveedor_id = '000116' AND a.xempresa_id=conv.xempresa_id AND pl_existalm.xarticulo_id=a.xarticulo_id
+LEFT OUTER JOIN yypl_vexistalm_out outlet ON outlet.xempresa_id=pl_existalm.xempresa_id AND outlet.xalmacen_id=pl_existalm.xalmacen_id AND outlet.xarticulo_id=pl_existalm.xarticulo_id 
+LEFT OUTER JOIN pl_cli_preart prpd ON prpd.xempresa_id = 'REDI' AND prpd.xcliente_id = '000041' AND prpd.n992_referencia = a.xarticulo_id 
+LEFT OUTER JOIN pl_existalm arpd ON prpd.xempresa_id = arpd.xempresa_id AND arpd.xalmacen_id = '001' AND arpd.xarticulo_id = prpd.xarticulo_id AND arpd.xempresa_id = 'REDI'  
+) AS consulta_existencias
+WHERE xalmacen_id NOT IN ('003','010','WSIN') AND xempresa_id = 'SCHB'
+AND xarticulo_id = 'AC03292500'
+GROUP BY xempresa_id,xarticulo_id
+ORDER BY xarticulo_id;
+
+2025-3-12//8:48:26WS: existencias-art
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'bidon-cliente-articulo';
+2025-3-12//8:48:26xempresa_id --- SCHB
+2025-3-12//8:48:26xcliente_id --- 11392
+2025-3-12//8:48:26xarticulo_id --- AC03292500
+2025-3-12//8:48:26SELECT: SELECT conv.xempresa_conv_id AS xempresa_id, c.xcontrato_id, c.xcliente_id, l.xarticulo_id
+FROM n992_cli_bidones_l l
+INNER JOIN yy_ws_emp_conv conv ON l.xempresa_id = conv.xempresa_id
+INNER JOIN n992_cli_bidones_c c ON l.xempresa_id = c.xempresa_id AND l.xcontrato_id = c.xcontrato_id
+WHERE conv.xempresa_conv_id = 'SCHB'
+AND c.xcliente_id = '11392'
+AND l.xarticulo_id = 'AC03292500'
+2025-3-12//8:48:26WS: bidon-cliente-articulo
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'precios';
+2025-3-12//8:48:26xempresa_id --- SCHB
+2025-3-12//8:48:26xcliente_id --- 11392
+2025-3-12//8:48:26xarticulo_id --- AC03292500
+2025-3-12//8:48:26xcantidad --- 1
+2025-3-12//8:48:26SELECT: http://172.26.110.207:5580/api/PRUEBAS_EKON/YYWS_SalesPrices/obtener-precios-venta-intranet
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'articulos_venta_aumentada';
+2025-3-12//8:48:28xempresa_id --- SCHB
+2025-3-12//8:48:28xarticulo_id --- AC03292500
+2025-3-12//8:48:28SELECT: SELECT * 
+FROM (SELECT conv.xempresa_conv_id AS xempresa_id,prod.xarticulo_prop_id as xarticulo_id,prod.xlinea_id as xorden
+FROM yyva_producto_rel AS prod 
+INNER JOIN yy_ws_emp_conv conv ON prod.xempresa_id = conv.xempresa_id
+INNER JOIN pl_articulos a ON a.xempresa_id=conv.xempresa_id and a.xarticulo_id='AC03292500' 
+INNER JOIN n992_articulos_opc opc ON opc.xempresa_id=prod.xempresa_id AND opc.xcategoria_prod_id=prod.xcategoria_prod_id AND opc.xarticulo_id=a.xarticulo_id
+INNER JOIN yyva_categoria_pro cat ON prod.xempresa_id = cat.xempresa_id AND prod.xcategoria_prod_id = cat.xcategoria_prod_id 
+INNER JOIN pl_articulos a1 ON a1.xempresa_id=prod.xempresa_id AND a1.xarticulo_id=prod.xarticulo_prop_id and (a1.n992_publica='-1') 
+WHERE conv.xempresa_conv_id = 'SCHB' AND prod.xarticulo_prop_id IS NOT NULL 
+UNION ALL
+SELECT conv.xempresa_conv_id AS xempresa_id,prod.xart2 as xarticulo_id ,'9999' as xorden
+FROM yyventacruzada AS prod 
+INNER JOIN yy_ws_emp_conv conv ON prod.xempresa_id = conv.xempresa_id
+INNER JOIN pl_articulos a ON a.xempresa_id=conv.xempresa_id and a.xarticulo_id='AC03292500' 
+INNER JOIN pl_articulos a1 ON a1.xempresa_id=prod.xempresa_id AND a1.xarticulo_id=prod.xart2 and (a1.n992_publica='-1') AND a1.xfamilia_id NOT IN ('OUTC2','OUTC') 
+WHERE conv.xempresa_conv_id = 'SCHB' AND prod.xart1 = 'AC03292500') as DATO
+ORDER BY xorden ASC;
+2025-3-12//8:48:28WS: articulos_venta_aumentada
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'existencias-art';
+2025-3-12//8:48:28xempresa_id --- SCHB
+2025-3-12//8:48:28xarticulo_id --- 1368307337
+2025-3-12//8:48:28SELECT: SELECT xempresa_id,xarticulo_id, SUM(xdisponible) AS xdisponible, SUM(xoutlet_disponible) AS xdisponible_outlet 
+FROM (
+SELECT DISTINCT  conv.xempresa_conv_id as xempresa_id,pl_existalm.xarticulo_id,
+ISNULL(outlet.xexist_out,0) AS xoutlet_disponible,
+(isnull(pl_existalm.xexistencia,0)-isnull(pl_existalm.n992_reserva,0)) AS xdisponible,
+pl_existalm.xalmacen_id 
+FROM pl_existalm pl_existalm
+INNER JOIN yy_ws_emp_conv conv ON pl_existalm.xempresa_id = conv.xempresa_id 
+LEFT OUTER JOIN pl_articulos a ON a.xproveedor_id = '000116' AND a.xempresa_id=conv.xempresa_id AND pl_existalm.xarticulo_id=a.xarticulo_id
+LEFT OUTER JOIN yypl_vexistalm_out outlet ON outlet.xempresa_id=pl_existalm.xempresa_id AND outlet.xalmacen_id=pl_existalm.xalmacen_id AND outlet.xarticulo_id=pl_existalm.xarticulo_id 
+LEFT OUTER JOIN pl_cli_preart prpd ON prpd.xempresa_id = 'REDI' AND prpd.xcliente_id = '000041' AND prpd.n992_referencia = a.xarticulo_id 
+LEFT OUTER JOIN pl_existalm arpd ON prpd.xempresa_id = arpd.xempresa_id AND arpd.xalmacen_id = '001' AND arpd.xarticulo_id = prpd.xarticulo_id AND arpd.xempresa_id = 'REDI'  
+) AS consulta_existencias
+WHERE xalmacen_id NOT IN ('003','010','WSIN') AND xempresa_id = 'SCHB'
+AND xarticulo_id = '1368307337'
+GROUP BY xempresa_id,xarticulo_id
+ORDER BY xarticulo_id;
+
+2025-3-12//8:48:28WS: existencias-art
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'bidon-cliente-articulo';
+2025-3-12//8:48:29xempresa_id --- SCHB
+2025-3-12//8:48:29xcliente_id --- 11392
+2025-3-12//8:48:29xarticulo_id --- 1368307337
+2025-3-12//8:48:29SELECT: SELECT conv.xempresa_conv_id AS xempresa_id, c.xcontrato_id, c.xcliente_id, l.xarticulo_id
+FROM n992_cli_bidones_l l
+INNER JOIN yy_ws_emp_conv conv ON l.xempresa_id = conv.xempresa_id
+INNER JOIN n992_cli_bidones_c c ON l.xempresa_id = c.xempresa_id AND l.xcontrato_id = c.xcontrato_id
+WHERE conv.xempresa_conv_id = 'SCHB'
+AND c.xcliente_id = '11392'
+AND l.xarticulo_id = '1368307337'
+2025-3-12//8:48:29WS: bidon-cliente-articulo
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'precios';
+2025-3-12//8:48:29xempresa_id --- SCHB
+2025-3-12//8:48:29xcliente_id --- 11392
+2025-3-12//8:48:29xarticulo_id --- 1368307337
+2025-3-12//8:48:29xcantidad --- 1
+2025-3-12//8:48:29SELECT: http://172.26.110.207:5580/api/PRUEBAS_EKON/YYWS_SalesPrices/obtener-precios-venta-intranet
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'articulos-masivo-total';
+2025-3-12//11:48:2xempresa_id --- SCHB
+2025-3-12//11:48:2max_registros_pagina --- 20000
+2025-3-12//11:48:2SELECT: SELECT total_registros, 20000 as max_registros_pagina, CEILING((total_registros*1.0/20000)) as paginas_totales  FROM (
+SELECT COUNT(*) AS total_registros 
+FROM pl_articulos a
+INNER JOIN yy_ws_emp_conv conv ON a.xempresa_id = conv.xempresa_id
+WHERE conv.xempresa_conv_id = 'SCHB' and n992_baja<>'-1' AND (n992_intranet='-1'  OR n992_publica='-1')
+) AS a;
+2025-3-12//11:48:3WS: articulos-masivo-total
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'articulos-masivo-paginacion';
+2025-3-12//11:48:3xempresa_id --- SCHB
+2025-3-12//11:48:3max_registros_pagina --- 20000
+2025-3-12//11:48:3numero_pagina --- 1
+2025-3-12//11:48:3SELECT: SELECT DISTINCT artic.* 
+FROM yyarticulos_intra artic
+WHERE artic.xempresa_id = 'SCHB' and xbaja<>'-1' AND (xintranet='-1' OR xweb_publica='-1' OR RefPrecioEspecial IS NOT NULL)
+ORDER BY xempresa_id, xarticulo_id
+OFFSET (20000*(1-1)) ROWS
+FETCH NEXT 20000 ROWS ONLY
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'target-distribuidor';
+2025-3-12//13:42:33xempresa_id --- SCHB
+2025-3-12//13:42:33xcliente_id --- 11392
+2025-3-12//13:42:33xciclo_id --- 2025
+2025-3-12//13:42:33SELECT: SELECT t.xciclo_id,t.xtarget, (SELECT ROUND(SUM(l.ximporte_db),0) as Ventas 
+FROM pl_fracli_cab c  
+INNER JOIN pl_fracli_lin l ON l.xempresa_id=c.xempresa_id AND l.xseccion_id=c.xseccion_id AND l.xciclo_id=c.xciclo_id AND l.xtipodoc_id=c.xtipodoc_id AND l.xnumdoc_id=c.xnumdoc_id  AND l.xarticulo_id IS NOT NULL 
+WHERE c.xempresa_id = conv.xempresa_id AND c.xcontabilizado='-1' AND c.xciclo_id=t.xciclo_id AND c.xcliente_id=t.xcliente_id ) as Sales, ROUND (((t.xtarget/12)*(MONTH(GETDATE())-1)),0) AS Expected 
+FROM n992_cli_target t  
+INNER JOIN yy_ws_emp_conv conv ON t.xempresa_id = conv.xempresa_id  
+WHERE conv.xempresa_conv_id = 'SCHB' AND t.xciclo_id='2025' AND t.xcliente_id='11392';
+2025-3-12//13:42:34WS: target-distribuidor
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'existencias-art';
+2025-3-12//13:43:12xempresa_id --- SCHB
+2025-3-12//13:43:12xarticulo_id --- SO04251000
+2025-3-12//13:43:12SELECT: SELECT xempresa_id,xarticulo_id, SUM(xdisponible) AS xdisponible, SUM(xoutlet_disponible) AS xdisponible_outlet 
+FROM (
+SELECT DISTINCT  conv.xempresa_conv_id as xempresa_id,pl_existalm.xarticulo_id,
+ISNULL(outlet.xexist_out,0) AS xoutlet_disponible,
+(isnull(pl_existalm.xexistencia,0)-isnull(pl_existalm.n992_reserva,0)) AS xdisponible,
+pl_existalm.xalmacen_id 
+FROM pl_existalm pl_existalm
+INNER JOIN yy_ws_emp_conv conv ON pl_existalm.xempresa_id = conv.xempresa_id 
+LEFT OUTER JOIN pl_articulos a ON a.xproveedor_id = '000116' AND a.xempresa_id=conv.xempresa_id AND pl_existalm.xarticulo_id=a.xarticulo_id
+LEFT OUTER JOIN yypl_vexistalm_out outlet ON outlet.xempresa_id=pl_existalm.xempresa_id AND outlet.xalmacen_id=pl_existalm.xalmacen_id AND outlet.xarticulo_id=pl_existalm.xarticulo_id 
+LEFT OUTER JOIN pl_cli_preart prpd ON prpd.xempresa_id = 'REDI' AND prpd.xcliente_id = '000041' AND prpd.n992_referencia = a.xarticulo_id 
+LEFT OUTER JOIN pl_existalm arpd ON prpd.xempresa_id = arpd.xempresa_id AND arpd.xalmacen_id = '001' AND arpd.xarticulo_id = prpd.xarticulo_id AND arpd.xempresa_id = 'REDI'  
+) AS consulta_existencias
+WHERE xalmacen_id NOT IN ('003','010','WSIN') AND xempresa_id = 'SCHB'
+AND xarticulo_id = 'SO04251000'
+GROUP BY xempresa_id,xarticulo_id
+ORDER BY xarticulo_id;
+
+2025-3-12//13:43:12WS: existencias-art
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'bidon-cliente-articulo';
+2025-3-12//13:43:12xempresa_id --- SCHB
+2025-3-12//13:43:12xcliente_id --- 11392
+2025-3-12//13:43:12xarticulo_id --- SO04251000
+2025-3-12//13:43:12SELECT: SELECT conv.xempresa_conv_id AS xempresa_id, c.xcontrato_id, c.xcliente_id, l.xarticulo_id
+FROM n992_cli_bidones_l l
+INNER JOIN yy_ws_emp_conv conv ON l.xempresa_id = conv.xempresa_id
+INNER JOIN n992_cli_bidones_c c ON l.xempresa_id = c.xempresa_id AND l.xcontrato_id = c.xcontrato_id
+WHERE conv.xempresa_conv_id = 'SCHB'
+AND c.xcliente_id = '11392'
+AND l.xarticulo_id = 'SO04251000'
+2025-3-12//13:43:12WS: bidon-cliente-articulo
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'precios';
+2025-3-12//13:43:12xempresa_id --- SCHB
+2025-3-12//13:43:12xcliente_id --- 11392
+2025-3-12//13:43:12xarticulo_id --- SO04251000
+2025-3-12//13:43:12xcantidad --- 1
+2025-3-12//13:43:12SELECT: http://172.26.110.207:5580/api/PRUEBAS_EKON/YYWS_SalesPrices/obtener-precios-venta-intranet
+SQL:SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = 'SCHB' AND xquery = 'articulos_venta_aumentada';
+2025-3-12//13:43:13xempresa_id --- SCHB
+2025-3-12//13:43:13xarticulo_id --- SO04251000
+2025-3-12//13:43:13SELECT: SELECT * 
+FROM (SELECT conv.xempresa_conv_id AS xempresa_id,prod.xarticulo_prop_id as xarticulo_id,prod.xlinea_id as xorden
+FROM yyva_producto_rel AS prod 
+INNER JOIN yy_ws_emp_conv conv ON prod.xempresa_id = conv.xempresa_id
+INNER JOIN pl_articulos a ON a.xempresa_id=conv.xempresa_id and a.xarticulo_id='SO04251000' 
+INNER JOIN n992_articulos_opc opc ON opc.xempresa_id=prod.xempresa_id AND opc.xcategoria_prod_id=prod.xcategoria_prod_id AND opc.xarticulo_id=a.xarticulo_id
+INNER JOIN yyva_categoria_pro cat ON prod.xempresa_id = cat.xempresa_id AND prod.xcategoria_prod_id = cat.xcategoria_prod_id 
+INNER JOIN pl_articulos a1 ON a1.xempresa_id=prod.xempresa_id AND a1.xarticulo_id=prod.xarticulo_prop_id and (a1.n992_publica='-1') 
+WHERE conv.xempresa_conv_id = 'SCHB' AND prod.xarticulo_prop_id IS NOT NULL 
+UNION ALL
+SELECT conv.xempresa_conv_id AS xempresa_id,prod.xart2 as xarticulo_id ,'9999' as xorden
+FROM yyventacruzada AS prod 
+INNER JOIN yy_ws_emp_conv conv ON prod.xempresa_id = conv.xempresa_id
+INNER JOIN pl_articulos a ON a.xempresa_id=conv.xempresa_id and a.xarticulo_id='SO04251000' 
+INNER JOIN pl_articulos a1 ON a1.xempresa_id=prod.xempresa_id AND a1.xarticulo_id=prod.xart2 and (a1.n992_publica='-1') AND a1.xfamilia_id NOT IN ('OUTC2','OUTC') 
+WHERE conv.xempresa_conv_id = 'SCHB' AND prod.xart1 = 'SO04251000') as DATO
+ORDER BY xorden ASC;
+2025-3-12//13:43:13WS: articulos_venta_aumentada
+Fri Mar 14 2025 16:52:29 GMT+0100 (hora estándar de Europa central)Server is running..
