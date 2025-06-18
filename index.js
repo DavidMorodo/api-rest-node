@@ -1,3 +1,5 @@
+require('dotenv').config();  // Muy importante: debe ir al inicio
+
 var app = require('./app');
 var port = process.env.PORT || 3999;
 

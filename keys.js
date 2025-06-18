@@ -1,12 +1,9 @@
 module.exports ={
     sqlConfig : {
-        user: 'imp',
-        password: 'ccsccs',
-        database: 'N992_DATA_UNIT4', //Este esl de TEST BUENO. en replica no hay data_unit4
-        server: '172.26.0.4',// eKON
-        //database: 'N992_DATA_NEW',
-        //server: '172.26.110.116',//replica 
-        //server: '92.54.15.197', //Claranet
+        user: process.env.USER_BBDD,
+        password: process.env.PASSWORD_BBDD,
+        database: process.env.DATA_BBDD,
+        server: process.env.SERVER_BBDD_REPLICA,//replica 
         pool: {
           max: 10,
           min: 0,
@@ -24,10 +21,10 @@ module.exports ={
       },
 
       EkonSqlConfig : {
-        user: 'imp',
-        password: 'ccsccs',
-        database: 'N992_DATA_UNIT4',
-        server: '172.26.0.4',
+        user: process.env.USER_BBDD,
+        password: process.env.PASSWORD_BBDD,
+        database: process.env.DATA_BBDD_PRUEBAS,
+        server: process.env.SERVER_BBDD,
         pool: {
           max: 10,
           min: 0,
@@ -45,11 +42,11 @@ module.exports ={
       },
 
       EkonSqlClaranet : {
-        user: 'imp',
-        password: 'ccsccs',
-        database: 'N992_DATA_NEW',
+        user: process.env.USER_BBDD,
+        password: process.env.PASSWORD_BBDD,
+        database: process.env.DATA_BBDD,
         //conexion Claranet.
-       server: '92.54.15.197',// eKON Claranet
+       server: process.env.SERVER_BBDD_CLARANET,// eKON Claranet
         pool: {
           max: 10,
           min: 0,
@@ -67,10 +64,31 @@ module.exports ={
       },    
 
       sqlWeb : {
-        user: 'imp',
-        password: 'ccsccs',
-        database: 'WEB_DATOS', //Este esl de TEST BUENO. en replica no hay data_unit4
-        server: '172.26.110.116',//replica 
+        user: process.env.USER_BBDD,
+        password: process.env.PASSWORD_BBDD,
+        database: process.env.DATA_BBDD_WEB, //Este esl de TEST BUENO. en replica no hay data_unit4
+        server: process.env.SERVER_BBDD_REPLICA,//replica 
+        pool: {
+          max: 10,
+          min: 0,
+          idleTimeoutMillis: 600000
+        },
+        //timeout de consulta añadido por carlos. 5minutos
+        requestTimeout: 600000,
+        options: {
+          //encrypt: true, // para conexion de azure
+          trustServerCertificate: true, // Cambiar a true para local dev / self-signed certs
+          cryptoCredentialsDetails: {
+              minVersion: 'TLSv1'
+          } 
+        }
+      },
+
+      sql_IA_Incidencias : {
+        user: process.env.USER_BBDD,
+        password: process.env.PASSWORD_BBDD,
+        database: process.env.DATA_BBDD,
+        server: process.env.SERVER_BBDD_REPLICA,//replica 
         pool: {
           max: 10,
           min: 0,
@@ -86,4 +104,5 @@ module.exports ={
           } 
         }
       }
+
 };

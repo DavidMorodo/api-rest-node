@@ -54,5 +54,6 @@ router.post('/listado_clientes_new',    peticionesController.listar_clientes_con
 router.get('/usuario/:xusuario',  md_autenticado.autenticado, peticionesController.obtener_usuario);
 
 router.post('/WS-IA',peticionesController.ws_ia_consultas_post);
+router.post('/WS-IA-TEST-APIKEY',peticionesController.ws_ia_consultas_post);
 
 module.exports = router;

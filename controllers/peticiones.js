@@ -7,9 +7,10 @@ const axios = require('axios');
 var generator = require('generate-password');
 const CryptoJS = require('crypto-js');
 const cifrado = require('../services/cifrados.js');
+const OpenAI = require('openai');
 
 //Requires base de datos
-const { sqlConfig,EkonSqlConfig,EkonSqlClaranet,sqlWeb } = require('../keys');
+const { sqlConfig,EkonSqlConfig,EkonSqlClaranet,sqlWeb,sql_IA_Incidencias } = require('../keys');
 const sql = require('mssql');
 const { assing_secondary_client } = require('../querys/querys');
 const e = require('express');
@@ -20,6 +21,7 @@ const pool2 = new sql.ConnectionPool(EkonSqlConfig);
 const pool3 = new sql.ConnectionPool(EkonSqlClaranet);
 const pool32 = new sql.ConnectionPool(EkonSqlConfig);
 const poolWeb = new sql.ConnectionPool(sqlWeb);
+const pool_IA = new sql.ConnectionPool(sql_IA_Incidencias);
 const limiteRegistrosBusqueda = 50000;
 var hora = new Date().getHours();
 var horaInicio = 0;
@@ -45,6 +47,11 @@ var poolWebConnect = poolWeb.connect()
         poolWeb.close();
         poolWebConnect = poolWeb.connect()
         console.log('Ha fallando poolWeb');
+    });
+var pool_IA_Connect = pool_IA.connect()
+    .catch((error) =>{
+        pool_IA.close();
+        console.log('Ha fallando pool_IA');
     });
 
 var controller = {
@@ -1396,7 +1403,12 @@ reset_password: async function (req, res) {
         const xcliente_id = paramsBody.xcliente_id;
         
         try{
-        xbusqueda = xbusqueda.replaceAll('\n', ' ').replaceAll('\t','').replaceAll('\\','').replaceAll('\\\\','').replaceAll('\r', ' ').replaceAll('\%','').replaceAll('\'','').replaceAll(', ',' ').replaceAll(',',' ').replaceAll('\"',' ').replaceAll('.','');
+            const prefijo = 'telegram';
+            if (xbusqueda.toLowerCase().includes(prefijo)) {
+              // 3. Lanzar excepción para interrumpir el flujo normal
+              throw new Error("Búsqueda " + xbusqueda.toLowerCase() + " no permitida desde : " + req.ip + " detectada.");
+            }
+            xbusqueda = xbusqueda.replaceAll('\n', ' ').replaceAll('\t','').replaceAll('\\','').replaceAll('\\\\','').replaceAll('\r', ' ').replaceAll('\%','').replaceAll('\'','').replaceAll(', ',' ').replaceAll(',',' ').replaceAll('\"',' ').replaceAll('.','');
                 //Insertamos la busqueda del usuario
                 try{
                     const request_log = poolWeb.request(); // o: new sql.Request(pool2) enlazamos con la bbdd real para insertar el log
@@ -1411,6 +1423,15 @@ reset_password: async function (req, res) {
                 }
             } catch (err) {
                 console.error(fecha_log() + ' Error: ', err);
+                if (err.message.startsWith('Búsqueda no permitida:') ){
+                    return res.status(500).json
+                        ({
+                            status: 500,
+                            ws,
+                            error: err.message
+                          });
+                    
+                }
                 return res.status(400).send({
                     status: "400", ws, error: "Faltan parametros"
                 });
@@ -1974,10 +1995,27 @@ ws_notificaciones_del: async function (req, res) {
             error: "Se ha producido un error descontrolado." 
         });
          }
-    }, ws_ia_consultas_post: async function (req, res) {
+    },
+   
+    ws_ia_consultas_post: async function (req, res) {
+        //Comprobamos la ruta de la API test para no duplicar todo este metodo.
+        //este control de api que NO utiliza el middlware. para utilizar el mid hay que hacer una funcion nueva sin next o utilzar una promise.
+        // 1. Extraer API Key de cabeceras
+        if (req.path.toUpperCase() == '/WS-IA-TEST-APIKEY'){
+            console.log ("API KEY : " + process.env.API_KEY_SECRETA);
+            const apiKeyCliente = req.headers['x-api-key'];
+            // 2. Validar presencia de la API Key
+            if (!apiKeyCliente) {
+            return res.status(401).json({ error: 'API Key requerida' });
+            }
+            // 3. Validar coincidencia con la clave secreta
+            if (apiKeyCliente !== process.env.API_KEY_SECRETA) {
+            return res.status(403).json({ error: 'API Key inválida.' });
+            }
+          }
         //David. 17_12_2024. Solicitudes para proyecrto IA.
-        console.log ("**********IA,Begining********** " + new Date().getTime());
-        var request = pool1.request(); // o: new sql.Request(pool1)
+        //David. 24_4_2025. Añadimos un pool nuevo para conectar con la replica y la busqueda para esta API en concreto.
+        var request = pool_IA.request(); // o: new sql.Request(pool1)
         var paramsHeader = req.headers;
         var paramsBody = req.body;
         
@@ -1990,7 +2028,7 @@ ws_notificaciones_del: async function (req, res) {
             var errorString ='';
             try {
                 const consultaSqlWS = "SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = '" + xempresa_id + "' AND xquery = '" + ws + "';";
-                console.log ("SQL:" + consultaSqlWS );
+                //console.log ("SQL:" + consultaSqlWS );
                 const resultadoConsultaSql = await request.query(consultaSqlWS);
                 //console.log(fecha_log() +  "TOTAL DE FILAS: " + resultadoConsultaSql.recordsets[0].length);
                 if (resultadoConsultaSql.recordsets[0].length == 0) {
@@ -2011,6 +2049,7 @@ ws_notificaciones_del: async function (req, res) {
                  const jsonParametrosBody = JSON.parse(JSON.stringify(paramsBody));
                  //comprobar que estan esos parametros en url
                  const mapaParametros = new Map();
+
                  var sustituto = "";	
                  for (var param in parametrosResultadoSplit) {	
                     if (jsonParametrosBody[parametrosResultadoSplit[param]] != null) {	
@@ -2027,6 +2066,7 @@ ws_notificaciones_del: async function (req, res) {
                             sustituto = d;	
                             selectResultado = await selectResultado.replaceAll("{" + parametrosResultadoSplit[param] + "}", sustituto);	
                         }else{	
+                            
                             if (parametrosResultadoSplit[param] == 'xempresa_id'){
                                 //ponemos este IF para que solo busque por LIKE del segundo campo cuando xcontador = '-1'
                                 sustituto = typeof jsonParametrosBody[parametrosResultadoSplit[param]] == 'number' ? jsonParametrosBody[parametrosResultadoSplit[param]] : "'"+jsonParametrosBody[parametrosResultadoSplit[param]]+"'";	
@@ -2046,7 +2086,7 @@ ws_notificaciones_del: async function (req, res) {
                         });	
                     }	
                 }	
-                console.log(fecha_log() +  'SELECT: '+selectResultado);
+                //console.log(fecha_log() +  'SELECT: '+selectResultado);
                     //sustituimos el maximos de registros si lo hay
                     var registros = 0;
                     if(max_registros != null && max_registros != ''){
@@ -2106,27 +2146,8 @@ ws_notificaciones_del: async function (req, res) {
             });
         }
     }
-    
 };
-async function control_precios(req, errores){
-    //metodo para grabar la respuesta del ws de precios y poder valorar cuando NO responde.
-    if (req.body.ws == 'precios'){
-        //console.log(fecha_log() + ' Insertamos precio.');
-        try{
-            const request_log = pool2.request(); // o: new sql.Request(pool2) enlazamos con la bbdd real para insertar el log
-            var sql_inserta = "INSERT INTO yy_www_busquedas_log (xempresa_id, xfecha, xbusqueda) ";
-            sql_inserta += "VALUES ('" + req.body.xempresa_id + "', GETDATE(),'" + "PRECIOS: " + errores + "__" + req.body.xcliente_id +"__"+ req.body.xarticulo_id + "')";
-            var resultado_insert = request_log.query(sql_inserta);
-            //console.log(fecha_log() +  'Aqui estamos: inserto registro');
-        }catch (err) {
-            console.warn(fecha_log() + ' ERROR al insertar el registro de busqueda.', err);
-            //return res.status(500).send({
-                //status: "500", ws, error: "Error interno en la peticion.",errorString
-            //});
-            //console.log(fecha_log() +  'Aqui estamos: fallo en el registro');
-        }
-    }
-  } ;
+
 function fecha_log(){
     var f =  new Date();
     var fecha = f.getFullYear();

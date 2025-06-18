@@ -18,9 +18,6 @@ app.use(bodyParser.json({ limit: "100MB" , extended: true}));
 app.use(bodyParser.xml());
 app.use(bodyParser.raw({ inflate: true, limit: '100kb', type: 'text/xml' }));
 
-
-
-
 //CORS
 // Configurar cabeceras y cors
 app.use((req, res, next) => {
