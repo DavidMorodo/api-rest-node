@@ -1552,18 +1552,6 @@ reset_password: async function (req, res) {
                         return res.status(400).send({
                             status: "400", ws, error: "Faltan datos.",
                     })};
-                   
-                    //Control de registros para que no devuelva miles.
-                    if (necesitaContadorTotales == '-1'){
-                        //console.log ("ENTRAMOS EN CONTADOR CONTROL");
-                        var preguntamos = await contadorRegistros (clausulaWhere,xempresa_id,ws,request,jsonParametrosBody,parametrosResultadoSplit)
-                        if (preguntamos > limiteRegistrosBusqueda){
-                            return res.status(205).send({
-                                status: "205", ws, error: "Busqueda demasiado extensa. Introduzca más información. " + preguntamos + " Reg.",
-                            });
-                        };    
-                    };
-                    //prueba de github 9:35
                     
                     // reemplazamos el primer campo de busqueda para poder ordenar la select.    
                     selectResultado = await selectResultado.replaceAll("{xwhere}",clausulaWhere);        
@@ -2003,13 +1991,11 @@ ws_notificaciones_del: async function (req, res) {
         });
          }
     },
-   
     ws_ia_consultas_post: async function (req, res) {
         //Comprobamos la ruta de la API test para no duplicar todo este metodo.
         //este control de api que NO utiliza el middlware. para utilizar el mid hay que hacer una funcion nueva sin next o utilzar una promise.
         // 1. Extraer API Key de cabeceras
         if (req.path.toUpperCase() == '/WS-IA-TEST-APIKEY'){
-            console.log ("API KEY : " + process.env.API_KEY_SECRETA);
             const apiKeyCliente = req.headers['x-api-key'];
             // 2. Validar presencia de la API Key
             if (!apiKeyCliente) {
@@ -2017,25 +2003,26 @@ ws_notificaciones_del: async function (req, res) {
             }
             // 3. Validar coincidencia con la clave secreta
             if (apiKeyCliente !== process.env.API_KEY_SECRETA) {
-            return res.status(403).json({ error: 'API Key inválida.' });
+            return res.status(403).json({ error: 'API Key inválida' });
             }
           }
         //David. 17_12_2024. Solicitudes para proyecrto IA.
         //David. 24_4_2025. Añadimos un pool nuevo para conectar con la replica y la busqueda para esta API en concreto.
-        var request = pool_IA.request(); 
+        var request = pool_IA.request(); // o: new sql.Request(pool1)
         var paramsHeader = req.headers;
         var paramsBody = req.body;
         
         const ws = paramsBody.ws;
         const xempresa_id = paramsBody.xempresa_id;
         const max_registros = paramsBody.max_registros;
+        var xbusqueda = paramsBody.xbusqueda;
         //console.log ("WS:" + ws);
         //buscamos la select en la tabla de parametros
         if (ws != null && xempresa_id != null) {
             var errorString ='';
             try {
                 const consultaSqlWS = "SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = '" + xempresa_id + "' AND xquery = '" + ws + "';";
-                //console.log ("SQL consulta:" + consultaSqlWS );
+                //console.log ("SQL:" + consultaSqlWS );
                 const resultadoConsultaSql = await request.query(consultaSqlWS);
                 //console.log(fecha_log() +  "TOTAL DE FILAS: " + resultadoConsultaSql.recordsets[0].length);
                 if (resultadoConsultaSql.recordsets[0].length == 0) {
@@ -2043,6 +2030,7 @@ ws_notificaciones_del: async function (req, res) {
                         status: "400", ws, error: "Peticion incorrecta"
                     });
                 }
+
                 var xcontador = resultadoConsultaSql.recordsets[0][0].xcontador;
                 var selectResultado = resultadoConsultaSql.recordsets[0][0].xconsulta;
                 var parametrosResultado = resultadoConsultaSql.recordsets[0][0].xparametros;
@@ -2054,65 +2042,47 @@ ws_notificaciones_del: async function (req, res) {
                  var camposTipoInSplit = camposTipoIn != null ? camposTipoIn.split(",") : '';
                  //parametros de url en json
                  const jsonParametrosBody = JSON.parse(JSON.stringify(paramsBody));
-                 //comprobar que estan esos parametros en url
-                 const mapaParametros = new Map();
 
-                 var sustituto = "";	
-                 for (var param in parametrosResultadoSplit) {	
-                    if (jsonParametrosBody[parametrosResultadoSplit[param]] != null) {	
-                        //console.log(fecha_log() +  parametrosResultadoSplit[param] + ' --- ' + jsonParametrosBody[parametrosResultadoSplit[param]]);	
-                        if(camposTipoInSplit.includes(parametrosResultadoSplit[param])){	
-                            var d = "(";	
-                            for(var i=0; i<jsonParametrosBody[parametrosResultadoSplit[param]].length; i++){	
-                                d+="'"+jsonParametrosBody[parametrosResultadoSplit[param]][i]+"',";	
-                            }	
-                            console.log(fecha_log() +  d);	
-                            d = d.substring(0, d.length -1);	
-                            d += ")";	
-
-                            sustituto = d;	
-                            selectResultado = await selectResultado.replaceAll("{" + parametrosResultadoSplit[param] + "}", sustituto);	
-                        }else{	
-                            
-                            if (parametrosResultadoSplit[param] == 'xempresa_id'){
-                                //ponemos este IF para que solo busque por LIKE del segundo campo cuando xcontador = '-1'
-                                sustituto = typeof jsonParametrosBody[parametrosResultadoSplit[param]] == 'number' ? jsonParametrosBody[parametrosResultadoSplit[param]] : "'"+jsonParametrosBody[parametrosResultadoSplit[param]]+"'";	
-                            }else if (xcontador == -1){
-                                sustituto = jsonParametrosBody[parametrosResultadoSplit[param]];	
-                            }else{
-                                sustituto = typeof jsonParametrosBody[parametrosResultadoSplit[param]] == 'number' ? jsonParametrosBody[parametrosResultadoSplit[param]] : "'"+jsonParametrosBody[parametrosResultadoSplit[param]]+"'";	
-                            }
-                            selectResultado = await selectResultado.replaceAll("{" + parametrosResultadoSplit[param] + "}", sustituto);	
-                            
-                        }	
-                    } else {	
-                        //const parametrosResultadoSplit[param] = parametros.parametrosResultadoSplit[param];	
-                        //console.log(fecha_log() +  parametrosResultadoSplit[param]);	
-                        return res.status(400).send({	
-                            status: "400", ws, error: "Faltan parametros"	
-                        });	
-                    }	
-                }	
-                //console.log(fecha_log() +  'SELECT: '+selectResultado);
-                    //sustituimos el maximos de registros si lo hay
-                    var registros = 0;
-                    if(max_registros != null && max_registros != ''){
-                        if(typeof max_registros == 'number'){
-                            selectResultado = await selectResultado.replaceAll("{max_registros}","SELECT TOP "+max_registros);
-                        }else{
-                            return res.status(400).send({
-                                status: "400", ws, error: "Registros máximos incorrectos"
-                            });
-                        }
-                    }else{
-                        selectResultado = await selectResultado.replaceAll("{max_registros}","SELECT ");
+                 for (var param in parametrosResultadoSplit) {
+                    if (jsonParametrosBody[parametrosResultadoSplit[param]] != null) {
+                        var sustituto = typeof jsonParametrosBody[parametrosResultadoSplit[param]] == 'number' ? jsonParametrosBody[parametrosResultadoSplit[param]] : "'"+jsonParametrosBody[parametrosResultadoSplit[param]]+"'";
+                        selectResultado = await selectResultado.replaceAll("{" + parametrosResultadoSplit[param] + "}", sustituto);
+                    } else {
+                        return res.status(400).send({
+                            status: "400", ws, error: "Faltan parametros"
+                        });
                     }
-                    //console.log(fecha_log() +  "SELECT OK: " + selectResultado);
-                    //ejecutamos la select devuelta de la tabla de consultas
-                    const resultadoSelectPedida = await request.query(selectResultado);
-                  
-                    var respuesta = resultadoSelectPedida.recordsets[0];
-                    registros = respuesta.length;
+                }
+
+                 //David. Ampliamos la busqueda a mas de una palabra. Dejamos los caracteres.
+                 //xbusqueda = xbusqueda.replaceAll('\n', ' ').replaceAll('\t','').replaceAll('\\','').replaceAll('\\\\','').replaceAll('\r', ' ').replaceAll('\%','').replaceAll('\'','').replaceAll(', ',' ').replaceAll(',',' ').replaceAll('\"',' ').replaceAll('.','');
+                 xbusqueda = xbusqueda.replaceAll('\n', ' ').replaceAll('\t','').replaceAll('\r', ' ').replaceAll('\%','').replaceAll(', ',' ').replaceAll(',',' ');
+
+                 var busquedaSplit = xbusqueda.replaceAll("-","").trim().split(" ");
+
+                 var indexBuscar ="*";
+                 //controlamos la busqueda de la primera palabra.
+                 var clausulaWhere = "";
+                 //contaremos las palabras para no buscar más de 5.
+                 for(var i = 0; i<busquedaSplit.length; i++){
+                    if ((busquedaSplit[i].toUpperCase() != 'DE')&&(busquedaSplit[i].toUpperCase() != 'EN')&&(busquedaSplit[i].toUpperCase() != 'Y')&&(busquedaSplit[i].toUpperCase() != 'EL')&&(busquedaSplit[i].toUpperCase() != 'PARA')&&(busquedaSplit[i].toUpperCase() != 'POR')   ){
+                                    
+                        clausulaWhere += " AND ( CONTAINS (ia.xbusqueda, '\""+busquedaSplit[i].toLowerCase()+"\"', language 3082) ";
+                        clausulaWhere +=" ) "; 
+
+                     }    
+                 }
+                 if (clausulaWhere == "") {
+                     return res.status(400).send({
+                         status: "400", ws, error: "Faltan datos.",
+                 })};
+                 
+                // reemplazamos el primer campo de busqueda para poder ordenar la select.    
+                selectResultado = await selectResultado.replaceAll("{xwhere}",clausulaWhere);      
+                console.log(fecha_log() +  "SELECT BUSQUEDA: "+selectResultado );
+                const resultadoSelectPedida = await request.query(selectResultado);
+                var respuesta = resultadoSelectPedida.recordsets[0];
+                var registros = respuesta.length;
                     
                     if(camposObjeto != null && camposObjeto != ''){
                         //leer campos objeto que hay en el campo "camposObbjeto"
@@ -2121,19 +2091,13 @@ ws_notificaciones_del: async function (req, res) {
                             for (var r in respuesta[i]) {
                                 if(camposObjetoSplit.includes(r)){
                                     if(respuesta[i][r] != null){
-                                        if (xcontador == '-1'){
-                                        respuesta[i][r] = JSON.parse(respuesta[i][r].replaceAll('\n', ' ').replaceAll('\\','').replaceAll('\t','').replaceAll('\\\\','').replaceAll('\r', ' '));
-                                        }else{
                                         respuesta[i][r] = JSON.parse(respuesta[i][r].replaceAll('\n', ' ').replaceAll('\t',''))
-                                        }
-                                     } 
-                                   
+                                     }               
                                 }
                             } 
                         }      
                     }
-                    console.log(fecha_log() + 'WS: ' + ws);
-                    //control_precios(req,200); //19/09/24 anulamos el control de precios. el error lo generaba la replica nueva
+                    console.log(fecha_log() + ' WS: ' + ws);
                     return res.status(200).send({
                         status: "200", ws, registros, respuesta
                     });
@@ -2153,6 +2117,7 @@ ws_notificaciones_del: async function (req, res) {
             });
         }
     }
+    
 };
 
 function fecha_log(){
