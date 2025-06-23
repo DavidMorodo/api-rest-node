@@ -21,6 +21,7 @@ module.exports ={
       },
 
       EkonSqlConfig : {
+        //23_6_25. pruebas. todo menos IA incidencias ha de apuntar a esta BBDD
         user: process.env.USER_BBDD,
         password: process.env.PASSWORD_BBDD,
         database: process.env.DATA_BBDD_PRUEBAS,

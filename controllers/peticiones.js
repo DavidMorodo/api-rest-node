@@ -14,10 +14,14 @@ const { sqlConfig,EkonSqlConfig,EkonSqlClaranet,sqlWeb,sql_IA_Incidencias } = re
 const sql = require('mssql');
 const { assing_secondary_client } = require('../querys/querys');
 const e = require('express');
-//const { param } = require('../routes/peticiones');
 const { request } = require('express');
-const pool1 = new sql.ConnectionPool(sqlConfig);
-const pool2 = new sql.ConnectionPool(EkonSqlConfig);
+//esta es la conexion pool correcta.
+//const pool1 = new sql.ConnectionPool(sqlConfig);
+//const pool2 = new sql.ConnectionPool(EkonSqlConfig);
+//David. 23_06_2025 intercambiamo los pools para que Desarrollo ataque a la BBDD Pruebas.
+const pool2 = new sql.ConnectionPool(sqlConfig);
+const pool1 = new sql.ConnectionPool(EkonSqlConfig);
+//Fin Control Desarrollo
 const pool3 = new sql.ConnectionPool(EkonSqlClaranet);
 const pool32 = new sql.ConnectionPool(EkonSqlConfig);
 const poolWeb = new sql.ConnectionPool(sqlWeb);
@@ -671,11 +675,8 @@ reset_password: async function (req, res) {
         await pool2Connect;
         try {
             const request = pool1.request(); // o: new sql.Request(pool1)
-            const request2 = pool2.request(); 
             const password_consulta = "SELECT xpassword, xempresa_id, xcliente_id, xperfil, xrol,xemail,xemail_responsable,xnombre,xapellidos FROM yy_ws_intranet_usu WHERE xusuario = '" + params.xusuario.toLowerCase() + "'";
-            //const resultado_password_consulta = await request.query(password_consulta);
-            //David. 12_9_2024. apuntamos al real para que el login responda siempre bien. Cuando replica actualiza deniega servicio dando error de login.
-            const resultado_password_consulta = await request2.query(password_consulta);
+            const resultado_password_consulta = await request.query(password_consulta);
             const numero_resultados_consulta_password = resultado_password_consulta.recordset.length;
             //Si el numero de resultados es == 0 es que no se ha encontrado el usuario
             if (numero_resultados_consulta_password == 0) {
@@ -718,7 +719,7 @@ reset_password: async function (req, res) {
 
                     //Guardamos el log en una tabla en BBDD
                     var ip = req.socket.remoteAddress;
-                    await request2.query("INSERT INTO yylogin_intranet (xempresa_id, xusuario, xcliente_id, xfecha_login,xip_login) VALUES ('"+empresa_usuario+"', '"+usuario+"', '"+cliente_usuario+"', GETDATE(),'"+ip+"');");
+                    await request.query("INSERT INTO yylogin_intranet (xempresa_id, xusuario, xcliente_id, xfecha_login,xip_login) VALUES ('"+empresa_usuario+"', '"+usuario+"', '"+cliente_usuario+"', GETDATE(),'"+ip+"');");
                     return res.status(200).send({
                         status: "200",
                         xusuario: usuario,
@@ -974,7 +975,7 @@ reset_password: async function (req, res) {
                 status: "500", err, error: "Error de Josep"
             });
         }
-        const request = pool1.request(); //conectamos con la replica para la consulta de datos.
+        const request = pool1.request(); 
         //buscamos la select en la tabla de parametros
         if (ws != null && xempresa_id != null) {
             var errorString ='';
@@ -1798,6 +1799,7 @@ reset_password: async function (req, res) {
         const xapellido = paramsBody.xapellido;
         type = type.toLowerCase();
         console.log(fecha_log() +  "ws_descargas. type:" + type + " Ref: " + ref + " Batch/Lang: "+batch+" email:"+email+" Empresa: "+xempresa_id);
+        try{
         if( (ws == "descarga-fichero-coa") || (type=="coa") ){
             ws = "descarga-fichero-coa";
             var sql_inserta = "INSERT INTO yy_www_descargas_log (xempresa_id, xfecha, xlote_id, xarticulo_id, xemail, xnombre, xapellido, xtienda_id,xws) ";
@@ -1816,6 +1818,12 @@ reset_password: async function (req, res) {
             //sql_inserta += "VALUES ('SCHB', GETDATE(),'" + paramsBody.xidioma + "', '" +paramsBody.xarticulo_id + "', '" +paramsBody.xemail+"', '" +paramsBody.xnombre+"', '" +paramsBody.xapellido+"','" + xempresa_id + "','"+paramsBody.ws+"');"
             var resultado_insert = request_log.query(sql_inserta);
         }    
+        }catch (err) {
+            console.warn (fecha_log() + ' ERROR al insertar el registro de Descarga.', err.message);
+            //return res.status(500).send({
+                //status: "500", ws, error: "Error interno en la peticion.",errorString
+            //});
+        }
         //try {
         const request = pool1.request(); //conectamos con la replica para la consulta de datos.
         //buscamos la select en la tabla de parametros
@@ -1901,8 +1909,7 @@ reset_password: async function (req, res) {
 ws_notificaciones_add: async function (req, res) {
     //David. 14-6-2024
     console.log(fecha_log() +  "Actualizar Notificaciones Cambio");
-    const request = pool1.request(); //conectamos con la replica para la consulta de datos.
-    const requestadd =  pool2.request(); //conectamos con la replica para la consulta de datos.
+    const request = pool1.request(); 
     var params = req.body;
     var cadena_params = JSON.parse(JSON.stringify(req.body));
     //Si no viene algun parametro lo indico en un error 400
@@ -1939,12 +1946,12 @@ ws_notificaciones_add: async function (req, res) {
                 //Si no existe hacemos un insert en pool2.
                  var sql_inserta = "INSERT INTO pl_artcliente (xempresa_id,xarticulo_id,xcliente_id,yycal_not_camb_web) ";
                  sql_inserta += "VALUES ('" + xempresa_id + "','" + xarticulo_id + "', '" +xcliente_id+"',-1);"          
-                 await requestadd.query(sql_inserta);
+                 await requesta.query(sql_inserta);
 
         }else {
                 // hacemos UPDATE en pool2
                 var sql_update = "UPDATE pl_artcliente SET yycal_not_camb_web=-1 WHERE xempresa_id = '" + xempresa_id + "' AND xarticulo_id = '" + xarticulo_id+ "' AND xcliente_id = '" + xcliente_id + "';";
-                await requestadd.query(sql_update);
+                await requesta.query(sql_update);
 
         }
         return res.status(200).send({
@@ -2015,7 +2022,7 @@ ws_notificaciones_del: async function (req, res) {
           }
         //David. 17_12_2024. Solicitudes para proyecrto IA.
         //David. 24_4_2025. Añadimos un pool nuevo para conectar con la replica y la busqueda para esta API en concreto.
-        var request = pool_IA.request(); // o: new sql.Request(pool1)
+        var request = pool_IA.request(); 
         var paramsHeader = req.headers;
         var paramsBody = req.body;
         
@@ -2028,7 +2035,7 @@ ws_notificaciones_del: async function (req, res) {
             var errorString ='';
             try {
                 const consultaSqlWS = "SELECT xempresa_id, xquery, xconsulta, xparametros, xws_ekon, xcampos_objeto, xcampos_tipo_in,xcontador FROM yy_ws_intranet WHERE xempresa_id = '" + xempresa_id + "' AND xquery = '" + ws + "';";
-                //console.log ("SQL:" + consultaSqlWS );
+                //console.log ("SQL consulta:" + consultaSqlWS );
                 const resultadoConsultaSql = await request.query(consultaSqlWS);
                 //console.log(fecha_log() +  "TOTAL DE FILAS: " + resultadoConsultaSql.recordsets[0].length);
                 if (resultadoConsultaSql.recordsets[0].length == 0) {
